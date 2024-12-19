@@ -5,14 +5,7 @@
     <h1>Create New Contact</h1>
     <form action="{{ route('contacts.store') }}" method="POST">
         @csrf
-        <div class="mb-3">
-            <label for="user_id" class="form-label">User</label>
-            <select name="user_id" id="user_id" class="form-select">
-                @foreach (\App\Models\User::all() as $user)
-                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                @endforeach
-            </select>
-        </div>
+
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
             <input type="text" class="form-control" id="name" name="name" required>
@@ -22,8 +15,8 @@
             <input type="email" class="form-control" id="email" name="email">
         </div>
         <div class="mb-3">
-            <label for="phone" class="form-label">Phone</label>
-            <input type="text" class="form-control" id="phone" name="phone">
+            <label for="subject" class="form-label">Subject</label>
+            <input type="text" class="form-control" id="subject" name="subject">
         </div>
         <div class="mb-3">
             <label for="message" class="form-label">Message</label>

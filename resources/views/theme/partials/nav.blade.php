@@ -8,16 +8,10 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav ms-auto p-4 p-lg-0">
             <a href="/" class="nav-item nav-link @yield('index-active')">Home</a>
+            <a href="{{ route('rentals.showRentals') }}" class="nav-item nav-link @yield('rent-active')">Rents</a>
+            <a href="{{ route('theme.team') }}" class="nav-item nav-link @yield('team-active')">Newsletters</a>
+            <a href="{{ route('rentals.showRentals') }}" class="nav-item nav-link @yield('rent-active')">Events</a>
             <a href="{{ route('theme.about') }}" class="nav-item nav-link @yield('about-active')">About</a>
-            <a href="{{ route('theme.service') }}" class="nav-item nav-link @yield('services-active')">Services</a>
-            <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle @yield('pages-active')" data-bs-toggle="dropdown">Pages</a>
-                <div class="dropdown-menu fade-up m-0">
-                    <a href="{{ route('theme.booking') }}" class="dropdown-item">Booking</a>
-                    <a href="{{ route('theme.team') }}" class="dropdown-item">Technicians</a>
-                    <a href="{{ route('theme.testimonial') }}" class="dropdown-item">Testimonial</a>
-                </div>
-            </div>
             <a href="{{ route('theme.contact') }}" class="nav-item nav-link @yield('contact-active')">Contact</a>
         </div>
 

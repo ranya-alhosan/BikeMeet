@@ -136,6 +136,11 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link " href="{{ route('motorcycles.index') }}">
+                    <i class="fas fa-motorcycle"></i> Motorcycles
+                </a>
+            </li>
+            <li class="nav-item">
                 <form action="{{ route('logout') }}" method="POST" id="logout-form">
                     @csrf
                     <a class="nav-link" href="#"

@@ -13,9 +13,12 @@
 
 @include('theme.partials.nav')
 
-
-@include('theme.partials.hero')
-
+<!-- Conditional Hero Section -->
+@if(Route::currentRouteName() === 'home')
+    @include('theme.partials.index-hero')
+@else
+    @include('theme.partials.hero')
+@endif
 
 @yield('content')
 

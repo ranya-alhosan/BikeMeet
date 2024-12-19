@@ -9,10 +9,10 @@
             <tr>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Phone</th>
+                <th>Subject</th>
                 <th>Message</th>
-                <th>User</th>
                 <th>Actions</th>
+
             </tr>
         </thead>
         <tbody>
@@ -20,11 +20,10 @@
                 <tr>
                     <td>{{ $contact->name }}</td>
                     <td>{{ $contact->email }}</td>
-                    <td>{{ $contact->phone }}</td>
+                    <td>{{ $contact->subject }}</td>
                     <td>{{ $contact->message }}</td>
-                    <td>{{ $contact->user->name }}</td>
                     <td>
-                        <a href="{{ route('contacts.show', $contact->id) }}" class="btn btn-info btn-sm">View</a>
+{{--                        <a href="{{ route('contacts.show', $contact->id) }}" class="btn btn-info btn-sm">View</a>--}}
                         <a href="{{ route('contacts.edit', $contact->id) }}" class="btn btn-warning btn-sm">Edit</a>
                         <form action="{{ route('contacts.destroy', $contact->id) }}" method="POST" class="d-inline">
                             @csrf

@@ -7,14 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rental extends Model
 {
+
+
     use HasFactory;
 
     protected $fillable = [
         'user_id',
         'motorcycle_id',
-        'rental_start_date',
+        'rental_start_date' ,
         'rental_end_date',
-        'status'
+        'status',
     ];
 
     public function user()
@@ -27,4 +29,9 @@ class Rental extends Model
     {
         return $this->belongsTo(Motorcycle::class);
     }
+    public function userRental()
+    {
+        return $this->hasOne(UserRental::class);
+    }
+
 }

@@ -11,7 +11,7 @@ class ContactController extends Controller
      */
     public function index()
     {
-        $contacts = Contact::with('user')->latest()->get();
+        $contacts = Contact::all();
         return view('dashboard.contacts.index', compact('contacts'));
     }
 
@@ -28,16 +28,23 @@ class ContactController extends Controller
      */
     public function store(Request $request)
     {
+        // Validation for the form fields
         $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
             'name' => 'required|string|max:255',
             'email' => 'nullable|email',
-            'phone' => 'nullable|string|max:15',
+            'subject' => 'nullable|string|max:255',
             'message' => 'nullable|string',
         ]);
 
+        // Create the contact record in the database
         Contact::create($validatedData);
-        return redirect()->route('contacts.index')->with('success', 'Contact created successfully!');
+
+        // Redirect based on the user's role, if necessary
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            return redirect()->route('contacts.index')->with('success', 'Contact created successfully!');
+        } else {
+            return redirect()->route('theme.contact')->with('success', 'Contact created successfully!');
+        }
     }
 
     /**
@@ -45,10 +52,10 @@ class ContactController extends Controller
      */
     public function show($id)
     {
-        $contact = Contact::with('user')->findOrFail($id);
+        $contact = Contact::with('user');
         return view('dashboard.contacts.show', compact('contact'));
     }
-    
+
     /**
      * Show the form for editing the specified contact.
      */
@@ -57,26 +64,25 @@ class ContactController extends Controller
         $contact = Contact::findOrFail($id);
         return view('dashboard.contacts.edit', compact('contact'));
     }
-    
+
 
     /**
      * Update the specified contact in storage.
      */
     public function update(Request $request, $id)
-{
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'nullable|email|max:255',
-        'phone' => 'nullable|string|max:20',
-        'message' => 'nullable|string',
-    ]);
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'subject' => 'nullable|string|max:255',
+            'message' => 'nullable|string',
+        ]);
 
-    $contact = Contact::findOrFail($id);
-    $contact->update($validatedData);
+        $contact = Contact::findOrFail($id);
+        $contact->update($validatedData);
 
-    return redirect()->route('contacts.index')->with('success', 'Contact updated successfully!');
-}
-
+        return redirect()->route('contacts.index')->with('success', 'Contact updated successfully!');
+    }
 
     /**
      * Remove the specified contact from storage.

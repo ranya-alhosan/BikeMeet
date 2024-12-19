@@ -28,4 +28,9 @@ class Motorcycle extends Model
     {
         return $this->hasMany(Calendar::class);
     }
+    public function userRentals()
+    {
+        return $this->hasMany(UserRental::class);
+    }
+
 }

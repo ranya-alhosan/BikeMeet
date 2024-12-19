@@ -11,11 +11,12 @@ class ThemeController extends Controller
     public function booking(){
         return view('theme.booking');
     }
+
     public function contact(){
         return view('theme.contact');
     }
     public function service(){
-        return view('theme.service');
+        return view('theme.rent');
     }
     public function team(){
         return view('theme.team');

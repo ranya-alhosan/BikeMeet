@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('motorcycle_id')->constrained('motorcycles')->onDelete('cascade');
             $table->dateTime('rental_start_date');
             $table->dateTime('rental_end_date');
-            $table->enum('status', ['active', 'completed', 'cancelled'])->default('active');
+            $table->enum('status', ['rented', 'available'])->default('available');
             $table->timestamps();
         });
     }

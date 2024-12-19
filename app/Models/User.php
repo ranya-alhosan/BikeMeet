@@ -46,8 +46,9 @@ class User extends Authenticatable
         return $this->hasMany(Calendar::class);
     }
 
-    public function contacts()
+    public function userRentals()
     {
-        return $this->hasMany(Contact::class);
+        return $this->hasMany(UserRental::class);
     }
+
 }

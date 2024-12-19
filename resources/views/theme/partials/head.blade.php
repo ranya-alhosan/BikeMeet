@@ -6,6 +6,7 @@
 
 <!-- Favicon -->
 <link href="{{ asset('assets') }}/img/favicon.ico" rel="icon">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
 <!-- Google Web Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,4 +28,5 @@
 
 <!-- Template Stylesheet -->
 <link href="{{ asset('assets') }}/css/style.css" rel="stylesheet">
+
 </head>
