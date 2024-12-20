@@ -11,8 +11,15 @@ class ContactController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
         $contacts = Contact::all();
+        if ($user->role === 'admin') {
+
         return view('dashboard.contacts.index', compact('contacts'));
+
+        }
+        return view('theme.contact');
+
     }
 
     /**

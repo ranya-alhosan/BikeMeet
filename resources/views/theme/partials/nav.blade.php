@@ -10,9 +10,9 @@
             <a href="/" class="nav-item nav-link @yield('index-active')">Home</a>
             <a href="{{ route('rentals.showRentals') }}" class="nav-item nav-link @yield('rent-active')">Rents</a>
             <a href="{{ route('theme.team') }}" class="nav-item nav-link @yield('team-active')">Newsletters</a>
-            <a href="{{ route('rentals.showRentals') }}" class="nav-item nav-link @yield('rent-active')">Events</a>
+            <a href="{{ route('events.UserIndex') }}" class="nav-item nav-link @yield('event-active')">Events</a>
             <a href="{{ route('theme.about') }}" class="nav-item nav-link @yield('about-active')">About</a>
-            <a href="{{ route('theme.contact') }}" class="nav-item nav-link @yield('contact-active')">Contact</a>
+            <a href="{{ route('user.showContact') }}" class="nav-item nav-link @yield('contact-active')">Contact</a>
         </div>
 
         @guest

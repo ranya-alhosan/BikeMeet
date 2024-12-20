@@ -50,5 +50,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserRental::class);
     }
+    public function events()
+    {
+        return $this->hasMany(Event::class); // Correct class name capitalization
+    }
+
 
 }

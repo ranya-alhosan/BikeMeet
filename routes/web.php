@@ -15,20 +15,25 @@ use App\Http\Controllers\MotorcycleController;
 
 
 
+
 // Public Routes
 Route::get('/', function () {
     return view('theme.index');
 })->name('home');
 
+Route::get('/showContacts', [ContactController::class,'index' ])->name('user.showContact');
+Route::post('/UserContacts', [ContactController::class,'store' ])->name('user.storeContact');
+
 // Public pages handled by ThemeController
 Route::controller(ThemeController::class)->name('theme.')->group(function () {
     Route::get('/about', 'about')->name('about');
-    Route::get('/booking', 'booking')->name('booking');
-    Route::get('/contact', 'contact')->name('contact');
     Route::get('/team', 'team')->name('team');
     Route::get('/testimonial', 'testimonial')->name('testimonial');
 });
-Route::post('/UserContacts', [ContactController::class,'store' ])->name('user.storeContact');
+
+
+
+
 
 // Guest-specific routes (for login view)
 Route::middleware('guest')->group(function () {
@@ -36,6 +41,9 @@ Route::middleware('guest')->group(function () {
         return view('dashboard.login'); // Your login view
     })->name('login');
 });
+
+
+
 
 // Authenticated and role-based routes
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -64,6 +72,13 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('/storeRentals', [RentalController::class, 'store'])->name('rentals.storeRentals');
     Route::get('/rentals/{rental}', [RentalController::class, 'show'])->name('rentals.showRentDetails');
     Route::post('/rentals/{rental}/proceed', [RentalController::class, 'proceedToRent'])->name('rentals.proceed');
+    Route::get('/UserEvents', [EventController::class, 'index'])->name('events.UserIndex');
+    Route::get('/UserEvents/{id}', [EventController::class, 'showDetails'])->name('events.showEventDetails');
+
+    Route::post('/events/{event}/enroll', [EventController::class, 'enroll'])->name('events.enroll');
+
+
+
 });
 
 // Authenticated users' logout route

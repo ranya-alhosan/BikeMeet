@@ -239,7 +239,7 @@ class RentalController extends Controller
         ]);
 
         // Redirect back with success message
-        return redirect()->route('rentals.show', $rental->id)->with('success', 'Rented, payment upon receipt of the motorcycle. Thank you.');
+        return redirect()->route('rentals.showRentals', $rental->id)->with('success', 'Rented, payment upon receipt of the motorcycle. Thank you.');
     }
 
 }
