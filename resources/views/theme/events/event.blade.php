@@ -5,7 +5,13 @@
 
 @section('content')
     <div class="container">
-        <h1 class="mt-4">Events</h1>
+        <!-- Title and Add Event Button Inline -->
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+            <h1>Events</h1>
+            <a href="{{ route('UserEvents.create') }}" class="text-primary fs-4" title="Add New Event">
+                <i class="fas fa-plus"></i>
+              </a>
+        </div>
 
         <!-- Filter Form -->
         <form action="{{ route('events.UserIndex') }}" method="GET" class="mb-4">
@@ -33,10 +39,12 @@
                         @endforeach
                     </select>
                 </div>
+
                 <!-- Apply Filters Button -->
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-primary w-100 d-flex justify-content-center">Filters</button>
                 </div>
+
                 <!-- Clear Filters Button -->
                 <div class="col-md-1">
                     <a href="{{ route('events.UserIndex') }}" class="btn btn-secondary w-100 d-flex justify-content-center">Clear</a>
@@ -61,6 +69,7 @@
                                     <strong>End Date:</strong> {{ $event->end_date->format('F j, Y, g:i a') }}<br>
                                     <strong>Fee:</strong> ${{ number_format($event->fee, 2) }}<br>
                                     <strong>Organizer:</strong> {{ $event->user->name ?? 'Unknown' }}<br>
+                                    <strong>Enrollments:</strong> {{ $event->enrollments_count }}<br> <!-- Add this line -->
                                     @if($event->status === 'upcoming')
                                         <strong>Status:</strong>
                                         <span class="text-success">Active</span>
@@ -68,6 +77,7 @@
                                         <span class="text-danger">See you soon</span>
                                     @endif
                                 </p>
+
                                 <a href="{{ route('events.showEventDetails', $event->id) }}" class="btn btn-primary">View Details</a>
                             </div>
                         </div>

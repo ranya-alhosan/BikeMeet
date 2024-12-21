@@ -12,6 +12,8 @@ use App\Http\Controllers\RentalController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MotorcycleController;
+use App\Http\Controllers\EventEnrollmentController;
+
 
 
 
@@ -60,6 +62,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('newsletters/{id}/like', [NewsletterController::class, 'like'])->name('newsletters.like');
     Route::post('newsletters/{id}/comment', [NewsletterController::class, 'comment'])->name('newsletters.comment');
     Route::resource('contacts', ContactController::class);
+    Route::resource('enrollment', EventEnrollmentController::class);
+
 
 });
 
@@ -72,11 +76,13 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('/storeRentals', [RentalController::class, 'store'])->name('rentals.storeRentals');
     Route::get('/rentals/{rental}', [RentalController::class, 'show'])->name('rentals.showRentDetails');
     Route::post('/rentals/{rental}/proceed', [RentalController::class, 'proceedToRent'])->name('rentals.proceed');
+
     Route::get('/UserEvents', [EventController::class, 'index'])->name('events.UserIndex');
     Route::get('/UserEvents/{id}', [EventController::class, 'showDetails'])->name('events.showEventDetails');
-
     Route::post('/events/{event}/enroll', [EventController::class, 'enroll'])->name('events.enroll');
 
+    Route::get('/createEvent', [EventController::class, 'create'])->name('UserEvents.create');
+    Route::post('/UserEvents/store', [EventController::class, 'store'])->name('events.UserStore');
 
 
 });

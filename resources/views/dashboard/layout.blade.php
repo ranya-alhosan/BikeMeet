@@ -121,6 +121,12 @@
             </li>
 
             <li class="nav-item">
+                <a class="nav-link @yield('events-active')" href="{{ route('enrollment.index') }}">
+                    <i class="bi bi-calendar-event"></i>Enrollment Events
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link @yield('rents-active')" href="{{ route('rentals.index') }}">
                     <i class="fas fa-motorcycle"></i>Rent Motorcycles
                 </a>

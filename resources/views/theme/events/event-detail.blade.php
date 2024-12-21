@@ -9,7 +9,7 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
             // SweetAlert Confirmation before Enrollment
-            document.getElementById('enrollBtn').addEventListener('click', function(event) {
+            document.getElementById('enrollBtn')?.addEventListener('click', function(event) {
                 event.preventDefault(); // Prevent the form from submitting immediately
 
                 Swal.fire({
@@ -82,10 +82,14 @@
 
                         <!-- Enroll Form -->
                         @if(auth()->check() && $event->status !== 'completed') <!-- Ensure user is logged in and event is not completed -->
+                        @if($event->user_id !== auth()->id()) <!-- Check if the logged-in user is not the event creator -->
                         <form action="{{ route('events.enroll', $event->id) }}" method="POST" id="enrollForm">
                             @csrf
                             <button type="submit" class="btn btn-success btn-lg" id="enrollBtn">Enroll</button>
                         </form>
+                        @else
+                            <p class="text-warning">You are the organizer of this event and cannot enroll.</p>
+                        @endif
                         @else
                             @if($event->status === 'completed')
                                 <p class="text-danger">This event is completed and no longer accepting enrollments.</p>
