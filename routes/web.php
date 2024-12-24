@@ -29,15 +29,10 @@ Route::post('/UserContacts', [ContactController::class,'store' ])->name('user.st
 // Public pages handled by ThemeController
 Route::controller(ThemeController::class)->name('theme.')->group(function () {
     Route::get('/about', 'about')->name('about');
-    Route::get('/team', 'team')->name('team');
     Route::get('/testimonial', 'testimonial')->name('testimonial');
 });
 
 
-
-
-
-// Guest-specific routes (for login view)
 Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
         return view('dashboard.login'); // Your login view
@@ -64,6 +59,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('contacts', ContactController::class);
     Route::resource('enrollment', EventEnrollmentController::class);
 
+    Route::delete('/DashNewsletters/{newsletter}', [NewsletterController::class, 'destroyNews'])->name('DashNewsletters.destroy');
+    Route::get('/DashNewsletters/{newsletter}/edit', [NewsletterController::class, 'DashEdit'])->name('DashNewsletters.edit');
+    Route::put('/DashNewsletters/{newsletter}', [NewsletterController::class, 'DashUpdate'])->name('DashNewsletters.update');
+    // Route to delete the comment
+    Route::delete('/DashComments/{comment}', [NewsletterController::class, 'destroyComment'])->name('DashComments.destroy');
+    Route::get('/DashNewsletters/create', [NewsletterController::class, 'DashCreate'])->name('DashNewsletters.create');
+    Route::post('/DashNewsletters', [NewsletterController::class, 'DashStore'])->name('DashNewsletters.store');
 
 });
 
@@ -71,6 +73,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
     Route::get('/showRentals', [RentalController::class, 'showRentals'])->name('rentals.showRentals');
     Route::get('/createRentals', [RentalController::class, 'create'])->name('rentals.createRentals');
     Route::post('/storeRentals', [RentalController::class, 'store'])->name('rentals.storeRentals');
@@ -80,10 +83,30 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/UserEvents', [EventController::class, 'index'])->name('events.UserIndex');
     Route::get('/UserEvents/{id}', [EventController::class, 'showDetails'])->name('events.showEventDetails');
     Route::post('/events/{event}/enroll', [EventController::class, 'enroll'])->name('events.enroll');
-
     Route::get('/createEvent', [EventController::class, 'create'])->name('UserEvents.create');
     Route::post('/UserEvents/store', [EventController::class, 'store'])->name('events.UserStore');
 
+    Route::get('/UserNewsletters', [NewsletterController::class, 'index'])->name('UserNewsletters.index');
+    Route::post('/UserNewsletter/{newsletter}/like', [NewsletterController::class, 'like'])->name('UserNewsletter.like');
+    Route::post('/UserNewsletter/{newsletter}/comment', [NewsletterController::class, 'comment'])->name('UserNewsletter.comment');
+
+    Route::delete('/UserComments/{id}', [NewsletterController::class, 'destroy'])->name('UserNewsletter.comment.delete');
+    Route::patch('/UserComments/{id}', [NewsletterController::class, 'update'])->name('UserNewsletter.comment.update');
+
+    Route::post('/UserNewsletters', [NewsletterController::class, 'store'])->name('UserNewsletter.store');
+
+    Route::get('/profile', [UsersController::class, 'profile'])->name('profile');
+// Display the Edit Profile form
+    Route::get('/UserProfile/edit', [UsersController::class, 'edit'])->name('UserProfile.edit');
+
+// Handle the Update Profile form submission
+    Route::put('/UserProfile/update', [UsersController::class, 'update'])->name('UserProfile.update');
+    Route::get('/user/motorcycles', [MotorcycleController::class, 'userMotorcycles'])->name('UserMotorcycles.index');
+    Route::get('/UserMotorcycles/{motorcycle}/edit', [MotorcycleController::class, 'edit'])->name('UserMotorcycles.edit');
+    Route::put('/UserMotorcycles/{motorcycle}', [MotorcycleController::class, 'updateMotor'])->name('UserMotorcycles.update');
+    Route::delete('/UserMotorcycles/{motorcycle}', [MotorcycleController::class, 'destroy'])->name('UserMotorcycles.destroy');
+
+    Route::post('/UserMotorcycles/store', [MotorcycleController::class, 'store'])->name('UserMotorcycles.store');
 
 });
 

@@ -7,27 +7,17 @@ use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
-
-    /**
-     * Display a listing of users.
-     */
     public function index()
     {
         $users = User::all(); // Fetch all users
         return view('dashboard.users.index', compact('users'));
     }
 
-    /**
-     * Show the form for creating a new user.
-     */
     public function create()
     {
         return view('dashboard.users.create');
     }
 
-    /**
-     * Store a newly created user in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -36,7 +26,7 @@ class UsersController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|string|in:admin,user',
         ]);
-    
+
         // If validation passes, create the user
         User::create([
             'name' => $validated['name'],
@@ -44,40 +34,104 @@ class UsersController extends Controller
             'password' => bcrypt($validated['password']),
             'role' => $validated['role'],
         ]);
-    
+
         return redirect()->route('users.index')->with('success', 'User created successfully!');
     }
-    
-    /**
-     * Show the form for editing the specified user.
-     */
+
     public function edit(User $user)
     {
-        return view('dashboard.users.edit', compact('user'));
+        $user = auth()->user();
+        if ($user->role === 'admin') {
+            return view('dashboard.users.edit', compact('user'));
+
+        }
+        return view('theme.edit', compact('user'));
+
     }
 
-    /**
-     * Update the specified user in storage.
-     */
     public function update(Request $request, User $user)
     {
+        $user = auth()->user();
+
+        // Validate input fields, including photo validation
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required|string|in:admin,user',
+            'phone_number' => 'nullable|string|max:15',
+            'country' => 'nullable|string|max:100',
+            'region' => 'nullable|string|max:100',
+            'current_password' => 'nullable|required_with:password|string',
+            'password' => 'nullable|string|min:8|confirmed',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $user->update($validated);
+        // Verify the current password
+        if (!empty($validated['current_password']) && !\Hash::check($validated['current_password'], $user->password)) {
+            return back()->withErrors(['current_password' => 'The current password is incorrect.']);
+        }
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully!');
+        // Update basic user fields
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'] ?? $user->phone_number,
+            'country' => $validated['country'] ?? $user->country,
+            'region' => $validated['region'] ?? $user->region,
+        ]);
+
+        // Update the password if provided
+        if (!empty($validated['password'])) {
+            $user->password = bcrypt($validated['password']);
+            $user->save();
+        }
+
+        // Handle the photo upload if provided
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($user->image && file_exists(storage_path('app/public/' . $user->image))) {
+                unlink(storage_path('app/public/' . $user->image));
+            }
+
+            // Store the new image
+            $imagePath = $request->file('image')->store('profile_images', 'public');
+
+            // Update the user's image path in the database
+            $user->update(['image' => $imagePath]);
+        }
+
+        // Redirect based on user role
+        if ($user->role === 'admin') {
+            return redirect()->route('users.index')->with('success', 'User updated successfully!');
+        }
+
+        return redirect()->route('profile')->with('success', 'Profile updated successfully!');
     }
 
-    /**
-     * Remove the specified user from storage.
-     */
     public function destroy(User $user)
     {
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully!');
     }
+
+    public function profile()
+    {
+        // Retrieve the authenticated user
+        $user = auth()->user();
+
+        // Return the profile view with user data
+        return view('theme.profile', compact('user'));
+    }
+
+    public function showUserEvents()
+    {
+        $user = auth()->user(); // Get the authenticated user
+
+        // Fetch the events related to the user. Adjust if you have a different relationship.
+        $events = $user->events()->get();
+
+        // Return the view with user and events data
+        return view('user.events.index', compact('user', 'events'));
+    }
+
+
 }

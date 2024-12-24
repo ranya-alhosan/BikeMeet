@@ -15,8 +15,8 @@ class ThemeController extends Controller
     public function service(){
         return view('theme.rent');
     }
-    public function team(){
-        return view('theme.team');
+    public function newsletter(){
+        return view('theme.newsletters.newsletter');
     }
     public function testimonial(){
         return view('theme.testimonial');

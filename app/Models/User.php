@@ -10,7 +10,9 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role'];
+    protected $fillable = [
+        'name', 'email', 'password', 'phone_number', 'country', 'region',
+    ];
 
     protected $hidden = [
         'password', 'remember_token',
@@ -53,6 +55,11 @@ class User extends Authenticatable
     public function events()
     {
         return $this->hasMany(Event::class); // Correct class name capitalization
+    }
+// User.php
+    public function newsletters()
+    {
+        return $this->hasMany(Newsletter::class);
     }
 
 

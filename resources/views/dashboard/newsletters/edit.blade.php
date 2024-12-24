@@ -1,20 +1,25 @@
 @extends('dashboard.layout')
 
 @section('content')
-<div class="container">
-    <h1>Edit Newsletter</h1>
-    <form action="{{ route('newsletters.update', $newsletter->id) }}" method="POST">
-        @csrf
-        @method('PUT')
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" value="{{ $newsletter->title }}" required>
-        </div>
-        <div class="mb-3">
-            <label for="content" class="form-label">Content</label>
-            <textarea class="form-control" id="content" name="content" rows="5" required>{{ $newsletter->content }}</textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Update Newsletter</button>
-    </form>
-</div>
+    <div class="container">
+        <h1>Edit Newsletter</h1>
+
+        <!-- Form to edit the newsletter -->
+        <form action="{{ route('DashNewsletters.update', $newsletter->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" value="{{ old('title', $newsletter->title) }}" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="content">Content</label>
+                <textarea id="content" name="content" class="form-control" required>{{ old('content', $newsletter->content) }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Update Newsletter</button>
+        </form>
+    </div>
 @endsection

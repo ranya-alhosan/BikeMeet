@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Motorcycle;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,6 +17,14 @@ class MotorcycleController extends Controller
 
         // Return the view with motorcycles data
         return view('dashboard.motorcycles.index', compact('motorcycles'));
+    }
+
+    public function userMotorcycles()
+    {
+        $user = auth()->user();
+        $motorcycles = $user->motorcycles; // Fetch motorcycles associated with the logged-in user
+
+        return view('theme.userMotorcycles', compact('motorcycles'));
     }
 
     public function create()
@@ -56,19 +65,32 @@ class MotorcycleController extends Controller
             'description' => $request->description,
             'image' => $imagePath,
         ]);
+        $user = auth()->user();
+        if ($user->role === 'admin') {
 
         return redirect()->route('motorcycles.index')->with('success', 'Motorcycle added successfully');
+        }
+        return redirect()->back()->with('success', 'Motorcycle added successfully!');
+
     }
 
 
     public function edit(Motorcycle $motorcycle)
     {
-        $users = User::all(); // Include users for selection
-        return view('dashboard.motorcycles.edit', compact('motorcycle', 'users'));
+        $user = auth()->user();
+        if ($user->role === 'admin') {
+
+            $users = User::all(); // Include users for selection
+            return view('dashboard.motorcycles.edit', compact('motorcycle', 'users'));
+        } else {
+            $this->authorize('update', $motorcycle); // Ensure user authorization
+            return view('motorcycles.edit', compact('motorcycle'));
+        }
     }
 
     public function update(Request $request, Motorcycle $motorcycle)
     {
+
         // Validate input
         $validatedData = $request->validate([
             'make' => 'nullable|string|max:255',
@@ -93,12 +115,44 @@ class MotorcycleController extends Controller
             // Update only fields that are provided
             $motorcycle->update($validatedData);
 
-            return redirect()->route('motorcycles.index')->with('success', 'Motorcycle updated successfully.');
-        } catch (\Exception $e) {
+                return redirect()->route('motorcycles.index')->with('success', 'Motorcycle updated successfully.');
+
+
+
+        } catch (Exception $e) {
             // Handle any errors and show error message
             return redirect()->route('motorcycles.index')->with('error', 'Failed to update motorcycle. Please try again.');
         }
+
     }
+    public function updateMotor(Request $request, $id)
+    {
+
+        $validatedData = $request->validate([
+            'make' => 'nullable|string|max:255',
+            'model' => 'nullable|string|max:255',
+            'year' => 'nullable|integer|min:1900|max:2100',
+            'price_per_day' => 'nullable|numeric|min:0',
+            'availability_status' => 'nullable|in:available,under_maintenance',
+            'description' => 'nullable|string',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $motorcycle = Motorcycle::findOrFail($id);
+
+        // Update fields
+        $motorcycle->update($validatedData);
+
+        // Handle image upload if exists
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('motorcycles', 'public');
+            $motorcycle->update(['image' => $path]);
+        }
+
+        return redirect()->back()->with('success', 'Motorcycle updated successfully!');
+    }
+
+
 
 
     public function show(Motorcycle $motorcycle)
@@ -108,6 +162,8 @@ class MotorcycleController extends Controller
 
     public function destroy(Motorcycle $motorcycle)
     {
+        $user = auth()->user();
+
         // Delete all related rentals
         $motorcycle->rentals()->delete();
 
@@ -119,7 +175,14 @@ class MotorcycleController extends Controller
         // Delete the motorcycle
         $motorcycle->delete();
 
-        return redirect()->route('motorcycles.index')->with('success', 'Motorcycle and its associated rentals deleted successfully');
+        if ($user->role === 'admin') {
+            return redirect()->route('motorcycles.index')->with('success', 'Motorcycle and its associated rentals deleted successfully');
+
+        }
+        return redirect()->route('UserMotorcycles.index')->with('success', 'Motorcycle deleted successfully!');
+
+
+
     }
 
 }

@@ -1,4 +1,4 @@
-<?PHP
+<?php
 namespace App\Http\Controllers;
 
 use App\Models\Newsletter;
@@ -9,26 +9,141 @@ use Illuminate\Http\Request;
 
 class NewsletterController extends Controller
 {
-    /**
-     * Display a listing of the newsletters.
-     */
     public function index()
     {
-        $newsletters = Newsletter::all(); // Fetch all newsletters
-        return view('dashboard.newsletters.index', compact('newsletters'));
+        $user = auth()->user();
+
+        // Check the user's role
+        if ($user->role === 'admin') {
+            // Retrieve newsletters, ordered by the latest created first
+            $newsletters = Newsletter::with(['user', 'likes', 'comments.user'])
+                ->latest() // Orders by created_at in descending order
+                ->get();
+            return view('dashboard.newsletters.index', compact('newsletters'));
+        } else {
+            // Retrieve newsletters, ordered by the latest created first
+            $newsletters = Newsletter::with(['user', 'likes', 'comments.user'])
+                ->latest() // Orders by created_at in descending order
+                ->get();
+            return view('theme.newsletters.index', compact('newsletters'));
+        }
     }
 
-    /**
-     * Show the form for creating a new newsletter.
-     */
+    // Like a newsletter
+    public function like(Newsletter $newsletter)
+    {
+        $user = auth()->user();
+
+        // Check if the user has already liked this newsletter
+        $like = NewsletterLike::where('user_id', $user->id)
+            ->where('newsletter_id', $newsletter->id)
+            ->first();
+
+        if ($like) {
+            // If the like exists, delete it
+            $like->delete();
+        } else {
+            // Otherwise, create a new like
+            NewsletterLike::create([
+                'user_id' => $user->id,
+                'newsletter_id' => $newsletter->id,
+            ]);
+        }
+
+        // Return the new like count as JSON
+        return response()->json([
+            'likes_count' => $newsletter->likes()->count(),
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $comment = NewsletterComment::findOrFail($id);
+
+        if (auth()->id() !== $comment->user_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Comment deleted successfully.',
+        ]);
+    }
+    public function destroyNews($id)
+    {
+        $newsletter = Newsletter::findOrFail($id);
+
+        // Optional: Check if the user is authorized to delete the newsletter
+        if (auth()->id() !== $newsletter->user_id && auth()->user()->role !== 'admin') {
+            return redirect()->route('newsletters.index')->with('error', 'Unauthorized action');
+        }
+
+        $newsletter->delete();
+
+        return redirect()->route('newsletters.index')->with('success', 'Newsletter deleted successfully!');
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $comment = NewsletterComment::findOrFail($id);
+
+        if (auth()->id() !== $comment->user_id) {
+            return response()->json(['error' => 'Unauthorized'], 403); // Prevent unauthorized access
+        }
+
+        $request->validate([
+            'comment' => 'required|string|max:255',
+        ]);
+
+        $comment->update([
+            'comment' => $request->input('comment'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Comment updated successfully.',
+            'comment' => $comment->comment,
+        ]);
+    }
+
+    // Comment on a newsletter
+    public function comment(Request $request, Newsletter $newsletter)
+    {
+        $user = auth()->user();
+
+        // Validate the comment
+        $validated = $request->validate([
+            'comment' => 'required|string|max:500',
+        ]);
+
+        // Create the comment
+        $comment = NewsletterComment::create([
+            'user_id' => $user->id,
+            'newsletter_id' => $newsletter->id,
+            'comment' => $validated['comment'],
+        ]);
+
+        // Return the new comment as JSON
+        return response()->json([
+            'user_name' => $user->name,
+            'comment' => $comment->comment,
+        ]);
+    }
+
     public function create()
     {
-        return view('dashboard.newsletters.create');
+        $user = auth()->user();
+
+        if ($user->role === 'admin') {
+            return view('dashboard.newsletters.create');
+        } else {
+            return redirect()->route('newsletters.index');
+        }
     }
 
-    /**
-     * Store a newly created newsletter in storage.
-     */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -36,96 +151,101 @@ class NewsletterController extends Controller
             'content' => 'required|string',
         ]);
 
+        // Add user_id to the validated data
+        $validatedData['user_id'] = auth()->id();
+
+        // Create the newsletter with the validated data including user_id
         Newsletter::create($validatedData);
 
-        return redirect()->route('newsletters.index')->with('success', 'Newsletter created successfully!');
+        return redirect()->route('UserNewsletters.index')->with('success', 'Newsletter created successfully!');
     }
 
-    /**
-     * Display the specified newsletter with its comments and likes.
-     */
     public function show($id)
     {
+        $user = auth()->user();
         $newsletter = Newsletter::findOrFail($id);
         $comments = $newsletter->comments()->with('user')->get();
         $likes = $newsletter->likes;
 
-        return view('dashboard.newsletters.show', compact('newsletter', 'comments', 'likes'));
+        if ($user->role === 'admin') {
+            return view('dashboard.newsletters.show', compact('newsletter', 'comments', 'likes'));
+        } else {
+            return view('theme.newsletters.index', compact('newsletter', 'comments', 'likes'));
+        }
     }
 
-    /**
-     * Show the form for editing the specified newsletter.
-     */
     public function edit($id)
     {
+        $user = auth()->user();
         $newsletter = Newsletter::findOrFail($id);
+
+        if ($user->role === 'admin')
+            return view('dashboard.newsletters.edit', compact('newsletter'));
+
+    }
+    public function DashEdit($id)
+    {
+        // Find the newsletter by ID
+        $newsletter = Newsletter::findOrFail($id);
+
+        // Return the view with the newsletter data
         return view('dashboard.newsletters.edit', compact('newsletter'));
     }
 
-    /**
-     * Update the specified newsletter in storage.
-     */
-    public function update(Request $request, $id)
+    // Update the newsletter
+    public function DashUpdate(Request $request, $id)
+    {
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
+        // Find the newsletter by ID
+        $newsletter = Newsletter::findOrFail($id);
+
+        // Update the newsletter with the validated data
+        $newsletter->update($validatedData);
+
+        // Redirect back with success message
+        return redirect()->route('newsletters.index')->with('success', 'Newsletter updated successfully!');
+    }
+    public function destroyComment($id)
+    {
+        // Find the comment by its ID
+        $comment = NewsletterComment::findOrFail($id);
+
+        // Check if the current user is the owner of the comment or an admin
+        if (auth()->id() !== $comment->user_id && auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403); // Unauthorized if not the owner or admin
+        }
+
+        // Delete the comment
+        $comment->delete();
+
+        // Redirect back with success message
+        return redirect()->route('newsletters.show', $comment->newsletter_id)->with('success', 'Comment deleted successfully!');
+    }
+    public function DashCreate()
+    {
+        return view('dashboard.newsletters.create');
+    }
+    public function DashStore(Request $request)
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
         ]);
 
-        $newsletter = Newsletter::findOrFail($id);
-        $newsletter->update($validatedData);
+        // Create the new newsletter
+        $validatedData['user_id'] = auth()->id(); // Store the authenticated user's ID
 
-        return redirect()->route('newsletters.index')->with('success', 'Newsletter updated successfully!');
+        // Create a new newsletter with the validated data
+        Newsletter::create($validatedData);
+
+        // Redirect to the newsletters index with a success message
+        return redirect()->route('newsletters.index')->with('success', 'Newsletter created successfully!');
     }
 
-    /**
-     * Remove the specified newsletter from storage.
-     */
-    public function destroy($id)
-    {
-        $newsletter = Newsletter::findOrFail($id);
-        $newsletter->delete();
 
-        return redirect()->route('newsletters.index')->with('success', 'Newsletter deleted successfully!');
-    }
-
-    /**
-     * Like a newsletter.
-     */
-    public function like(Request $request, $id)
-    {
-        $newsletter = Newsletter::findOrFail($id);
-        $user = auth()->user();
-
-        // Check if the user has already liked this newsletter
-        if (!$newsletter->likes()->where('user_id', $user->id)->exists()) {
-            NewsletterLike::create([
-                'user_id' => $user->id,
-                'newsletter_id' => $newsletter->id,
-            ]);
-        }
-
-        return redirect()->route('newsletters.show', $newsletter->id);
-    }
-
-    /**
-     * Comment on a newsletter.
-     */
-    public function comment(Request $request, $id)
-    {
-        $request->validate([
-            'comment' => 'required|string',
-        ]);
-
-        $newsletter = Newsletter::findOrFail($id);
-        $user = auth()->user();
-
-        NewsletterComment::create([
-            'user_id' => $user->id,
-            'newsletter_id' => $newsletter->id,
-            'comment' => $request->comment,
-        ]);
-
-        return redirect()->route('newsletters.show', $newsletter->id);
-    }
 }

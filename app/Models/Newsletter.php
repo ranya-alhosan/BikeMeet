@@ -10,7 +10,7 @@ class Newsletter extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'content'
+        'title', 'content','user_id'
     ];
 
     public function likes()
@@ -22,6 +22,11 @@ class Newsletter extends Model
     {
         return $this->hasMany(NewsletterComment::class);
     }
-    
+    // Newsletter.php
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }
 

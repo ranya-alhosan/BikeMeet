@@ -1,5 +1,7 @@
 /********** Template CSS **********/
-:root {
+@import url('https://fonts.cdnfonts.com/css/baroness-kuffner');
+
+  :root {
     --primary: #e05100;
     --secondary: #008FE0;
     --light: #F2F2F2;
@@ -77,7 +79,7 @@
 .navbar .dropdown-toggle::after {
     border: none;
     content: "\f107";
-    font-family: "Font Awesome 5 Free";
+    font-family: 'Baroness Kuffner', sans-serif;
     font-weight: 900;
     vertical-align: middle;
     margin-left: 8px;
@@ -182,10 +184,12 @@
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
+
 }
 
 .page-header-inner {
-    background: rgba(0, 0, 0, .7);
+    background: rgba(0, 0, 0, .5);
+    height: 200px;
 }
 
 .breadcrumb-item + .breadcrumb-item::before {
@@ -350,7 +354,7 @@
 .footer .btn.btn-link::before {
     position: relative;
     content: "\f105";
-    font-family: "Font Awesome 5 Free";
+    font-family: 'Baroness Kuffner', sans-serif;
     font-weight: 900;
     margin-right: 10px;
 }
