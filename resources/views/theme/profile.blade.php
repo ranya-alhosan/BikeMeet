@@ -54,7 +54,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('UserNewsletters.index') }}" class="d-block text-dark py-2 menu-item">
+                                <a href="{{ route('ProfNewsletters.index') }}" class="d-block text-dark py-2 menu-item">
                                     <i class="fas fa-newspaper"></i> Newsletters
                                 </a>
                             </li>
@@ -107,18 +107,7 @@
         color: #6c757d;
     }
 
-    /* Button Styling */
-    .btn-primary {
-        background-color: #007bff;
-        border: none;
-        border-radius: 30px;
-        transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    }
 
-    .btn-primary:hover {
-        background-color: #0056b3;
-        box-shadow: 0 4px 8px rgba(0, 91, 187, 0.2);
-    }
 
     /* Card Styling for Menu */
     .card {

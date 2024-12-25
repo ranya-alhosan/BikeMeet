@@ -27,7 +27,15 @@ class NewsletterController extends Controller
                 ->get();
             return view('theme.newsletters.index', compact('newsletters'));
         }
-    }
+    }public function indexProf()
+{
+    // Fetch all newsletters for the authenticated user
+    $newsletters = auth()->user()->newsletters; // Assuming the User model has a relationship with Newsletter
+
+    // Return the view with the newsletters data
+    return view('theme.newsletterUser', compact('newsletters'));
+}
+
 
     // Like a newsletter
     public function like(Newsletter $newsletter)

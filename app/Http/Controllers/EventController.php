@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\User;
+use App\Models\UserRental;
+use App\Models\Newsletter;
+
 use Illuminate\Http\Request;
 use App\Models\EventEnrollment;
 
@@ -59,14 +63,11 @@ class EventController extends Controller
         return view('theme.events.event', compact('events', 'locations'));
     }
 
-
-
     public function showDetails($id)
     {
         $event = Event::with('user', 'enrollments')->findOrFail($id);
         return view('theme.events.event-detail', compact('event'));
     }
-
 
     public function enroll($eventId)
     {
@@ -102,12 +103,9 @@ class EventController extends Controller
         return redirect()->route('events.UserIndex')->with('success', 'You have successfully enrolled in the event.');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        $user = auth()->user(); // Get the currently logged-in user
+        $user = auth()->user();
         if ($user->role === 'admin') {
             return view('dashboard.events.create');
 
@@ -115,9 +113,6 @@ class EventController extends Controller
         return view('theme.events.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -150,17 +145,11 @@ class EventController extends Controller
         return redirect()->route('events.UserIndex')->with('success', 'Event created successfully.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Event $event)
     {
         return view('dashboard.events.edit', compact('event'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Event $event)
     {
         $validatedData = $request->validate([
@@ -178,13 +167,21 @@ class EventController extends Controller
         return redirect()->route('events.index')->with('success', 'Event updated successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Event $event)
     {
         $event->delete();
 
         return redirect()->route('events.index')->with('success', 'Event deleted successfully!');
+    }
+
+    public function latestEvents()
+    {
+        $events = Event::latest()->take(3)->get();
+        $totalUsers = User::count();
+        $totalRentals = UserRental::count();
+        $totalEvents = Event::count();
+        $totalNewsletters = Newsletter::count();
+
+        return view('theme.index', compact('events','totalUsers', 'totalRentals', 'totalEvents', 'totalNewsletters'));
     }
 }

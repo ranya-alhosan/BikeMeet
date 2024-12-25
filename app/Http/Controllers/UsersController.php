@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Newsletter;
+use App\Models\NewsletterLike;
+use App\Models\NewsletterComment;
+
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -122,6 +126,117 @@ class UsersController extends Controller
         return view('theme.profile', compact('user'));
     }
 
+
+    public function showUserNewsletters()
+    {
+        $user = auth()->user();
+
+        // Fetch newsletters with comment and like counts
+        $newsletters = $user->newsletters()
+            ->with(['comments.user']) // Eager load the comments and the user who made them
+            ->withCount(['likes', 'comments']) // Add counts for likes and comments
+            ->paginate(10);
+
+        return view('theme.newsletterUser', compact('user', 'newsletters'));
+    }
+
+
+
+    public function destroyNewsletter($id)
+    {
+        try {
+            $newsletter = Newsletter::findOrFail($id);
+
+            // Ensure the authenticated user owns the newsletter
+            if ($newsletter->user_id !== auth()->id()) {
+                return redirect()->back()->with('error', 'Unauthorized action.');
+            }
+
+            // Delete the newsletter
+            $newsletter->delete();
+
+            return redirect()->route('ProfNewsletters.index')->with('success', 'Newsletter deleted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An error occurred while deleting the newsletter.');
+        }
+    }
+
+    public function updateNewsletter(Request $request, $id)
+    {
+
+        try {
+            $newsletter = Newsletter::findOrFail($id);
+
+            // Ensure the authenticated user owns the newsletter
+            if ($newsletter->user_id !== auth()->id()) {
+                return redirect()->back()->with('error', 'Unauthorized action.');
+            }
+
+            // Validate the input
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'content' => 'required|string',
+            ]);
+
+            // Update the newsletter
+            $newsletter->update([
+                'title' => $request->input('title'),
+                'content' => $request->input('content'),
+            ]);
+
+            return redirect()->route('ProfNewsletters.index')->with('success', 'Newsletter updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An error occurred while updating the newsletter.');
+        }
+    }
+
+    public function toggleLike(Request $request, $id)
+    {
+        $user = auth()->user();
+
+        // Find the newsletter
+        $newsletter = Newsletter::findOrFail($id);
+
+        // Check if the user has already liked the newsletter
+        $like = NewsletterLike::where('user_id', $user->id)
+            ->where('newsletter_id', $newsletter->id)
+            ->first();
+
+        if ($like) {
+            // Unlike the newsletter
+            $like->delete();
+            return redirect()->back()->with('success', 'You unliked this newsletter.');
+        } else {
+            // Like the newsletter
+            NewsletterLike::create([
+                'user_id' => $user->id,
+                'newsletter_id' => $newsletter->id,
+            ]);
+            return redirect()->back()->with('success', 'You liked this newsletter.');
+        }
+    }
+
+    // Handle adding a comment to a newsletter
+    public function addComment(Request $request, $id)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:255',
+        ]);
+
+        $user = auth()->user();
+
+        // Find the newsletter
+        $newsletter = Newsletter::findOrFail($id);
+
+        // Add the comment
+        NewsletterComment::create([
+            'user_id' => $user->id,
+            'newsletter_id' => $newsletter->id,
+            'comment' => $request->comment,
+        ]);
+
+        return redirect()->back()->with('success', 'Your comment has been added.');
+    }
     public function showUserEvents()
     {
         $user = auth()->user(); // Get the authenticated user
@@ -132,6 +247,4 @@ class UsersController extends Controller
         // Return the view with user and events data
         return view('user.events.index', compact('user', 'events'));
     }
-
-
 }

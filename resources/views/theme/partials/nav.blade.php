@@ -17,7 +17,6 @@
 
         <!-- Navbar Links and Auth -->
         <div class="collapse navbar-collapse" id="navbarCollapse">
-            <!-- Center Navbar Links -->
             <ul class="navbar-nav mx-auto p-4 p-lg-0">
                 <li class="nav-item">
                     <a href="/" class="nav-link @yield('index-active')">Home</a>
@@ -50,28 +49,44 @@
             @endguest
             @auth
                 <div class="d-flex align-items-center">
-                    <!-- Profile Image -->
-                    <a href="{{ route('profile') }}" class="d-inline-block me-3">
-                        <img
-                            src="{{ auth()->user()->profile_photo ? asset('storage/' . auth()->user()->profile_photo) : asset('assets')}}/img/defaultUser.png"
-                            alt="Profile Image"
-                            class="rounded-circle"
-                            style="width: 40px; height: 40px; object-fit: cover; cursor: pointer;"
-                        >
-                    </a>
-
-                    <!-- Logout Button Inside -->
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button
-                            type="submit"
-                            class="btn  btn-sm rounded-pill px-3 py-1 W-50"
-                        >
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </form>
+                    <!-- Profile Image with Hover Dropdown -->
+                    <div class="dropdown profile-dropdown">
+                        <a href="#" class="d-inline-block me-3" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img
+                                src="{{ auth()->user()->profile_photo ? asset('storage/' . auth()->user()->profile_photo) : asset('assets')}}/img/defaultUser.png"
+                                alt="Profile Image"
+                                class="rounded-circle"
+                                style="width: 40px; height: 40px; object-fit: cover; cursor: pointer;"
+                            >
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="{{ route('profile') }}">Profile</a></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             @endauth
         </div>
     </div>
 </nav>
+
+<style>
+    /* Prevent horizontal scrolling when hovering over the profile photo dropdown */
+    .navbar-nav {
+        overflow-x: hidden;
+    }
+
+    .dropdown-menu-start {
+        left: auto;
+        right: 0;
+    }
+
+    .profile-dropdown {
+        position: relative;
+    }
+</style>

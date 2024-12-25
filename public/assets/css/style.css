@@ -166,6 +166,7 @@
     height: 3rem;
 }
 
+
 @media (max-width: 768px) {
     #header-carousel .carousel-item {
         position: relative;
@@ -199,7 +200,7 @@
 
 /*** Facts ***/
 .fact {
-    background: linear-gradient(rgba(0, 0, 0, .7), rgba(0, 0, 0, .7)), url(../img/carousel-bg-1.jpg);
+    background: linear-gradient(rgba(0, 0, 0, .7), rgba(0, 0, 0, .7)), url(../img/num.jpg);
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
