@@ -180,46 +180,35 @@
                 <h1 class="mb-5">Hear From Our Happy Riders!</h1>
             </div>
             <div class="owl-carousel testimonial-carousel position-relative">
-                <div class="testimonial-item text-center">
-                    <img class="bg-light rounded-circle p-2 mx-auto mb-3" src="{{asset('assets')}}/img/testimonial1.jpg" style="width: 80px; height: 80px;">
-                    <h5 class="mb-0">Ahmed Ali</h5>
-                    <p>Motorcycle Lover</p>
-                    <div class="testimonial-text bg-light text-center p-4">
-                        <p class="mb-0">BikeMeet has been a great way for me to meet other motorcycle enthusiasts. It’s easy to use and I’ve had a lot of fun connecting with fellow riders!</p>
+                @foreach ($testimonials as $testimonial)
+                    <div class="testimonial-item text-center">
+                        <img class="bg-light rounded-circle p-2 mx-auto mb-3"
+                             src="{{ asset($testimonial['image']) }}"
+                             style="width: 80px; height: 80px;">
+                        <h5 class="mb-0">{{ $testimonial['name'] }}</h5>
+                        <p>{{ $testimonial['role'] }}</p>
+                        <div class="testimonial-text bg-light text-center p-4">
+                            <p class="mb-0">{{ $testimonial['text'] }}</p>
+                        </div>
                     </div>
-                </div>
-                <div class="testimonial-item text-center">
-                    <img class="bg-light rounded-circle p-2 mx-auto mb-3" src="{{asset('assets')}}/img/testimonial2.jpg" style="width: 80px; height: 80px;">
-                    <h5 class="mb-0">Mahmoud Mustafa</h5>
-                    <p>Motorcycle Renter</p>
-                    <div class="testimonial-text bg-light text-center p-4">
-                        <p class="mb-0">Renting a bike through BikeMeet was so easy. I found the perfect ride in no time and had a smooth experience throughout. I’ll definitely rent again!</p>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center">
-                    <img class="bg-light rounded-circle p-2 mx-auto mb-3" src="{{asset('assets')}}/img/testimonial3.jpg" style="width: 80px; height: 80px;">
-                    <h5 class="mb-0">Sami Adel</h5>
-                    <p>Event Organizer</p>
-                    <div class="testimonial-text bg-light text-center p-4">
-                        <p class="mb-0">I’ve organized several events with BikeMeet, and it’s been such a pleasure. The platform makes everything easy, and the riders always have a great time!</p>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center">
-                    <img class="bg-light rounded-circle p-2 mx-auto mb-3" src="{{asset('assets')}}/img/testimonial4.jpg" style="width: 80px; height: 80px;">
-                    <h5 class="mb-0">Tarek Said</h5>
-                    <p>Motorcycle Enthusiast</p>
-                    <div class="testimonial-text bg-light text-center p-4">
-                        <p class="mb-0">BikeMeet has made it so much easier to connect with other motorcycle fans. I love the community and the ability to share rides and experiences!</p>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </div>
-    <!-- Testimonial End -->
->
+
+
 
     <style>
         /* General Styles */
+        .testimonial-text {
+            min-height: 120px; /* Set a minimum height for consistency */
+            max-height: 120px; /* Optional: Limit the maximum height */
+            display: flex; /* Enable flexbox for alignment */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            overflow: hidden; /* Prevent overflow if the content is longer */
+            text-overflow: ellipsis; /* Add ellipsis if the text is too long */
+        }
         .event-card {
             position: relative;
             overflow: hidden;

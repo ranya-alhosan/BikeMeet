@@ -103,7 +103,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/', [EventController::class, 'latestEvents'])->name('home');
 
     Route::resource('testimonials', TestimonialController::class);
-    Route::get('testimonials', [TestimonialController::class, 'index']);
+    Route::get('/testimonials', [TestimonialController::class, 'showTestimonials'])->name('testimonials.index');
 
 
 });

@@ -157,6 +157,7 @@
                             </div>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -219,15 +220,23 @@
     <!-- About the Creator End -->
 
 
-    <!-- SweetAlert Success Message -->
-    @if(session('success'))
+    {{-- SweetAlert Messages --}}
+    @if (session('success'))
         <script>
             Swal.fire({
                 icon: 'success',
-                title: 'Testimonial Submitted',
+                title: 'Success!',
                 text: '{{ session('success') }}',
-                showConfirmButton: false,
-                timer: 2000
+            });
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session('error') }}',
             });
         </script>
     @endif

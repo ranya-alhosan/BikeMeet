@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\User;
 use App\Models\UserRental;
 use App\Models\Newsletter;
+use App\Models\Testimonial;
 
 use Illuminate\Http\Request;
 use App\Models\EventEnrollment;
@@ -182,6 +183,56 @@ class EventController extends Controller
         $totalEvents = Event::count();
         $totalNewsletters = Newsletter::count();
 
-        return view('theme.index', compact('events','totalUsers', 'totalRentals', 'totalEvents', 'totalNewsletters'));
+        // Fetch testimonials with status 'Accept' and load related user
+        $testimonials = Testimonial::latest()->where('status', 'Accept')->with('user')->get();
+
+        // Default testimonials to show if there aren't enough from the database
+        $defaultTestimonials = [
+            [
+                'name' => 'Ahmed Ali',
+                'role' => 'Motorcycle Lover',
+                'text' => 'BikeMeet has been a great way for me to meet other motorcycle enthusiasts. It’s easy to use and I’ve had a lot of fun connecting with fellow riders!',
+                'image' => 'assets/img/testimonial1.jpg'
+            ],
+            [
+                'name' => 'Mahmoud Mustafa',
+                'role' => 'Motorcycle Renter',
+                'text' => 'Renting a bike through BikeMeet was so easy. I found the perfect ride in no time and had a smooth experience throughout. I’ll definitely rent again!',
+                'image' => 'assets/img/testimonial2.jpg'
+            ],
+            [
+                'name' => 'Sami Adel',
+                'role' => 'Event Organizer',
+                'text' => 'I’ve organized several events with BikeMeet, and it’s been such a pleasure. The platform makes everything easy, and the riders always have a great time!',
+                'image' => 'assets/img/testimonial3.jpg'
+            ],
+            [
+                'name' => 'Tarek Said',
+                'role' => 'Motorcycle Enthusiast',
+                'text' => 'BikeMeet has made it so much easier to connect with other motorcycle fans. I love the community and the ability to share rides and experiences!',
+                'image' => 'assets/img/testimonial4.jpg'
+            ]
+        ];
+
+        // Map database testimonials to include user data
+        $testimonials = $testimonials->map(function ($testimonial) {
+            return [
+                'name' => $testimonial->user->name ?? 'Unknown User', // Fetch name from related user or fallback
+                'role' => $testimonial->role,
+                'text' => $testimonial->text,
+                'image' => $testimonial->user->image ?? 'assets/img/users.png', // Fetch user image or fallback
+            ];
+        });
+
+        // Calculate how many default testimonials to add
+        $defaultCount = max(0, 4 - $testimonials->count());
+
+        // Add default testimonials if needed
+        if ($defaultCount > 0) {
+            $testimonials = $testimonials->concat(array_slice($defaultTestimonials, 0, $defaultCount));
+        }
+
+        return view('theme.index', compact('testimonials', 'events', 'totalUsers', 'totalRentals', 'totalEvents', 'totalNewsletters'));
     }
+
 }
