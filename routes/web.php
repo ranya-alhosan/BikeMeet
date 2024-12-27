@@ -13,6 +13,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MotorcycleController;
 use App\Http\Controllers\EventEnrollmentController;
+use App\Http\Controllers\TestimonialController;
 
 
 Route::get('/', function () {
@@ -100,6 +101,9 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
 
     Route::get('/', [EventController::class, 'latestEvents'])->name('home');
+
+    Route::resource('testimonials', TestimonialController::class);
+    Route::get('testimonials', [TestimonialController::class, 'index']);
 
 
 });

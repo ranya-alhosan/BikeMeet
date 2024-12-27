@@ -7,6 +7,9 @@
     --light: #F2F2F2;
     --dark: #111111;
 }
+.imp{
+    color: var(--secondary);
+}
 
 .fw-medium {
     font-weight: 600 !important;

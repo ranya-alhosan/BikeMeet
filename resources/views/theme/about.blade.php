@@ -5,15 +5,8 @@
 
 @section('content')
 
-    <!-- Hero Start -->
-    <div class="container-xxl py-5">
-        <div class="container">
-            <div class="text-center">
-                <p class="lead">A community dedicated to motorcycle enthusiasts!</p>
-            </div>
-        </div>
-    </div>
-    <!-- Hero End -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <!-- About Start -->
     <div class="container-xxl py-5">
@@ -78,44 +71,222 @@
     <div class="container-fluid fact bg-dark my-5 py-5">
         <div class="container">
             <div class="row g-4">
+                <!-- Total Users -->
                 <div class="col-md-6 col-lg-3 text-center wow fadeIn" data-wow-delay="0.1s">
                     <i class="fa fa-users fa-2x text-white mb-3"></i>
-                    <h2 class="text-white mb-2" data-toggle="counter-up">BikeMeet</h2>
-                    <p class="text-white mb-0">The Ultimate Community</p>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ $totalUsers }}</h2>
+                    <p class="text-white mb-0">Total Users</p>
                 </div>
+                <!-- Total Rentals -->
                 <div class="col-md-6 col-lg-3 text-center wow fadeIn" data-wow-delay="0.3s">
-                    <i class="fa fa-users-cog fa-2x text-white mb-3"></i>
-                    <h2 class="text-white mb-2" data-toggle="counter-up">5000+</h2>
-                    <p class="text-white mb-0">Members Connected</p>
+                    <i class="fa fa-motorcycle fa-2x text-white mb-3"></i>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ $totalRentals }}</h2>
+                    <p class="text-white mb-0">Total Rentals</p>
                 </div>
+                <!-- Total Events -->
                 <div class="col-md-6 col-lg-3 text-center wow fadeIn" data-wow-delay="0.5s">
                     <i class="fa fa-calendar fa-2x text-white mb-3"></i>
-                    <h2 class="text-white mb-2" data-toggle="counter-up">100+</h2>
-                    <p class="text-white mb-0">Events Organized</p>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ $totalEvents }}</h2>
+                    <p class="text-white mb-0">Total Events</p>
                 </div>
+                <!-- Total Newsletters -->
                 <div class="col-md-6 col-lg-3 text-center wow fadeIn" data-wow-delay="0.7s">
-                    <i class="fa fa-motorcycle fa-2x text-white mb-3"></i>
-                    <h2 class="text-white mb-2" data-toggle="counter-up">1500+</h2>
-                    <p class="text-white mb-0">Motorcycles Rented</p>
+                    <i class="fa fa-newspaper fa-2x text-white mb-3"></i>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ $totalNewsletters }}</h2>
+                    <p class="text-white mb-0">Total Newsletters</p>
                 </div>
             </div>
         </div>
     </div>
     <!-- Fact End -->
 
-    <!-- About the Creator Start -->
+    <!-- Testimonial Start -->
+
     <div class="container-xxl py-5">
         <div class="container">
             <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-                <h6 class="text-primary text-uppercase">// About the Creator //</h6>
-                <h1 class="mb-5">My Journey as a Developer</h1>
-                <p class="lead">I am a passionate developer with a strong interest in building innovative and efficient platforms. As a graduate of Orange Academy for Programming, I have honed my skills in full-stack development, focusing on creating seamless, user-friendly experiences. Throughout my journey, I have worked with Laravel for the backend, leveraging its robust features to create secure, scalable, and efficient web applications. For the frontend, I have used React to create dynamic, responsive interfaces that provide an engaging experience for users.</p>
-                <p class="lead">With BikeMeet, I have combined my love for motorcycles with my technical expertise, creating a platform that serves the needs of motorcycle enthusiasts. By using tools like Laravel, React, and modern development practices, I aimed to provide a solution that improves the way riders communicate, organize events, and rent motorcycles.</p>
-                <img src="{{ asset('assets') }}/img/creator.jpg" alt="Developer Photo" class="img-fluid rounded-circle mb-4" style="width: 200px;">
-                <p class="lead">This platform is not just a technical achievement, but a product of my passion for programming and motorcycles. I’ve learned a great deal about both the technical and the creative aspects of development, and I look forward to building more impactful projects in the future.</p>
+                <h6 class="text-primary text-uppercase ">// Testimonials //</h6>
+            </div>
+            <div class="row g-5 align-items-center mt-3">
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
+                    <div class="row g-0 about-bg rounded overflow-hidden">
+                        <div class="col-6 text-start">
+                            <img class="img-fluid w-100" src="{{asset('assets')}}/img/about4.jpg">
+                        </div>
+                        <div class="col-6 text-start">
+                            <img class="img-fluid" src="{{asset('assets')}}/img/hero-img.jpg" style="width: 85%;height: 200px; margin-top: 15%;">
+                        </div>
+                        <div class="col-6 text-end">
+                            <img class="img-fluid" src="{{asset('assets')}}/img/hero-img2.jpg" style="width: 85%;">
+                        </div>
+                        <div class="col-6 text-end">
+                            <img class="img-fluid w-100" src="{{asset('assets')}}/img/a.jpg" style="height: 350px;margin-top:-35px" >
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+                    <h1 class="mb-4">What Our Community Says</h1>
+                    <p class="mb-4">We love hearing from our community! Share your thoughts and experiences with us. Your testimonial can inspire others to join the community.</p>
+                    <form action="{{ route('testimonials.store') }}" method="POST">
+                        @csrf
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ auth()->user()->name }}" readonly>
+                                    <label for="name">Your Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-control" id="role" name="role" required>
+                                        <option value="Motorcycle Lover">Motorcycle Lover</option>
+                                        <option value="Motorcycle Renter">Motorcycle Renter</option>
+                                        <option value="Event Organizer">Event Organizer</option>
+                                    </select>
+                                    <label for="role">Your Role</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" id="text" name="text" required></textarea>
+                                    <label for="text">Testimonial</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 py-3" type="submit">Submit Testimonial</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+    <!-- Testimonial End -->
+
+    <!-- Team Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h6 class="text-primary text-uppercase">// Our Technicians //</h6>
+                <h1 class="mb-5">Our Expert Technicians</h1>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-8 col-md-10 col-sm-12 mx-auto wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="team-item d-flex flex-column flex-md-row align-items-center p-3 shadow-lg rounded bg-light" style="overflow: hidden;">
+                        <!-- Image Section -->
+                        <div class="position-relative overflow-hidden flex-shrink-0 rounded mb-3 mb-md-0" style="width: 100%; max-width: 250px; height: auto;">
+                            <img class="img-fluid w-100 h-100" src="{{asset('assets')}}/img/rania.jpg" alt="Ranya Al-Hosan" style="object-fit: cover;">
+                            <div class="team-overlay position-absolute start-0 top-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                                <a class="btn btn-square mx-1" href="https://github.com/ranya-alhosan" target="_blank">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a class="btn btn-square mx-1" href="https://www.linkedin.com/in/ranya-al-hosan-370634264/" target="_blank">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Text Section -->
+                        <div class="p-4 flex-grow-1 text-center text-md-start">
+                            <h3 class="fw-bold mb-2 text-primary">Ranya Al-Hosan</h3>
+                            <small class="d-block text-muted mb-4">Full-Stack Developer</small>
+                            <p class="text-muted">
+                                Growing up,<span class="imp">my father’s passion</span>  for motorcycles inspired me deeply. I noticed how bikers struggled to organize events and communicate effectively through scattered platforms like WhatsApp. This sparked an idea: to create a seamless, organized solution that brings motorcycle enthusiasts together.
+                            </p>
+                            <p class="text-muted">
+                                With this project,<span class="imp">I envision a global community</span>  where bikers can effortlessly connect, share their passion, and organize events with ease. It’s not just a platform—it’s a celebration of the biking lifestyle and a way to strengthen the bonds within this incredible community.
+                            </p>
+                            <div class="text-center text-md-end">
+                                <a class="btn btn-primary btn-sm px-4 rounded-pill" href="https://www.linkedin.com/in/ranya-al-hosan-370634264/" target="_blank">Know More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Team End -->
+
+
+
+
+
+    <div class="text-center mt-5">
+        <h3 class="mb-3">Join Our Club</h3>
+        <p>Become a part of our vibrant motorcycling community! Sign up for our newsletter or check out our upcoming events.</p>
+        <a href="#" class="btn btn-primary px-5 py-2">Explore Events</a>
+    </div>
     <!-- About the Creator End -->
+
+
+    <!-- SweetAlert Success Message -->
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Testimonial Submitted',
+                text: '{{ session('success') }}',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        </script>
+    @endif
+
+    <style>
+        #text {
+            resize: none; /* Prevent resizing of the textarea */
+            overflow: hidden; /* Hide the scrollbar */
+            height: 100px; /* Set a fixed height to make it scrollable */
+        }
+
+        #text::-webkit-scrollbar {
+            display: none; /* Hide scrollbar in Webkit browsers */
+        }
+
+        #text {
+            -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+            scrollbar-width: none; /* Hide scrollbar in Firefox */
+        }
+
+        .about-bg {
+            background-image: -webkit-repeating-radial-gradient(center center, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2) 1px, transparent 1px, transparent 100%);
+            background-image: -moz-repeating-radial-gradient(center center, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2) 1px, transparent 1px, transparent 100%);
+            background-image: -ms-repeating-radial-gradient(center center, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2) 1px, transparent 1px, transparent 100%);
+            background-image: -o-repeating-radial-gradient(center center, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2) 1px, transparent 1px, transparent 100%);
+            background-image: repeating-radial-gradient(center center, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2) 1px, transparent 1px, transparent 100%);
+            background-size: 5px 5px;
+        }
+
+        .btn-primary {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        /* Smooth Hover Effect for Team Members */
+        .team-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .team-overlay:hover {
+            opacity: 1;
+        }
+
+        /* Form Design */
+        .form-floating {
+            margin-bottom: 15px;
+        }
+
+        /* Add a shadow to the testimonial form button */
+        .btn-primary {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:focus {
+            outline: none;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+    </style>
 
 @endsection

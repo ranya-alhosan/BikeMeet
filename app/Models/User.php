@@ -18,6 +18,11 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    // Define the relationship with the Testimonial model
+    public function testimonial()
+    {
+        return $this->hasOne(Testimonial::class); // User has one Testimonial
+    }
     public function eventEnrollments()
     {
         return $this->hasMany(EventEnrollment::class);

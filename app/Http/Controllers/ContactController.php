@@ -50,7 +50,7 @@ class ContactController extends Controller
         if (auth()->check() && auth()->user()->role === 'admin') {
             return redirect()->route('contacts.index')->with('success', 'Contact created successfully!');
         } else {
-            return redirect()->route('theme.contact')->with('success', 'Contact created successfully!');
+            return redirect()->route('theme.about')->with('success', 'Contact created successfully!');
         }
     }
 
