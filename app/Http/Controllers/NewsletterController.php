@@ -28,13 +28,13 @@ class NewsletterController extends Controller
             return view('theme.newsletters.index', compact('newsletters'));
         }
     }public function indexProf()
-{
+    {
     // Fetch all newsletters for the authenticated user
     $newsletters = auth()->user()->newsletters; // Assuming the User model has a relationship with Newsletter
 
     // Return the view with the newsletters data
     return view('theme.newsletterUser', compact('newsletters'));
-}
+   }
 
 
     // Like a newsletter
@@ -93,7 +93,6 @@ class NewsletterController extends Controller
         return redirect()->route('newsletters.index')->with('success', 'Newsletter deleted successfully!');
     }
 
-
     public function update(Request $request, $id)
     {
         $comment = NewsletterComment::findOrFail($id);
@@ -117,7 +116,6 @@ class NewsletterController extends Controller
         ]);
     }
 
-    // Comment on a newsletter
     public function comment(Request $request, Newsletter $newsletter)
     {
         $user = auth()->user();
@@ -157,16 +155,24 @@ class NewsletterController extends Controller
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
         ]);
 
         // Add user_id to the validated data
         $validatedData['user_id'] = auth()->id();
+
+        // Handle the image upload if present
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('newsletters', 'public');
+            $validatedData['image'] = $imagePath; // Save image path
+        }
 
         // Create the newsletter with the validated data including user_id
         Newsletter::create($validatedData);
 
         return redirect()->route('UserNewsletters.index')->with('success', 'Newsletter created successfully!');
     }
+
 
     public function show($id)
     {
@@ -175,12 +181,14 @@ class NewsletterController extends Controller
         $comments = $newsletter->comments()->with('user')->get();
         $likes = $newsletter->likes;
 
+
         if ($user->role === 'admin') {
             return view('dashboard.newsletters.show', compact('newsletter', 'comments', 'likes'));
         } else {
             return view('theme.newsletters.index', compact('newsletter', 'comments', 'likes'));
         }
     }
+
 
     public function edit($id)
     {
@@ -200,7 +208,6 @@ class NewsletterController extends Controller
         return view('dashboard.newsletters.edit', compact('newsletter'));
     }
 
-    // Update the newsletter
     public function DashUpdate(Request $request, $id)
     {
         // Validate the incoming request data
@@ -218,6 +225,7 @@ class NewsletterController extends Controller
         // Redirect back with success message
         return redirect()->route('newsletters.index')->with('success', 'Newsletter updated successfully!');
     }
+
     public function destroyComment($id)
     {
         // Find the comment by its ID
@@ -234,10 +242,12 @@ class NewsletterController extends Controller
         // Redirect back with success message
         return redirect()->route('newsletters.show', $comment->newsletter_id)->with('success', 'Comment deleted successfully!');
     }
+
     public function DashCreate()
     {
         return view('dashboard.newsletters.create');
     }
+
     public function DashStore(Request $request)
     {
         $validatedData = $request->validate([
@@ -254,6 +264,24 @@ class NewsletterController extends Controller
         // Redirect to the newsletters index with a success message
         return redirect()->route('newsletters.index')->with('success', 'Newsletter created successfully!');
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->get('query', '');
+
+        $newsletters = Newsletter::with('user')
+            ->where('title', 'LIKE', '%' . $query . '%')
+            ->orWhere('content', 'LIKE', '%' . $query . '%')
+            ->orWhereHas('user', function ($q) use ($query) {
+                $q->where('name', 'LIKE', '%' . $query . '%');
+            })
+            ->get();
+
+        return response()->json([
+            'html' => view('theme.newsletters.newsletter_results', compact('newsletters'))->render()
+        ]);
+    }
+
 
 
 }

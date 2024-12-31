@@ -33,7 +33,7 @@
         }
 
         .form-control {
-            background-color: transparent;
+            background-color:var(--light) ;
             border-color: rgba(255, 255, 255, 0.3);
             color: var(--light);
         }
@@ -67,13 +67,14 @@
 <body>
 <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
     <div class="row w-100">
-        <div class="col-md-6 offset-md-3">
-            <div class="card shadow-lg">
-                <div class="card-header text-center py-4">
-                    <h3 class="card-title">Sign Up</h3>
+        <div class="col-md-6 offset-md-3" >
+            <div class="card shadow-lg " >
+                <div class="card-header text-center py-3">
+                    <img src="{{asset('assets')}}/img/logo.png" style="max-width: 200px">
+                    <h3 class="card-title"><b>Sign Up</b></h3>
                     <h6>Join the ride and explore the world with us!</h6>
                 </div>
-                <div class="card-body p-5">
+                <div class="card-body p-4">
                     <form method="POST" action="{{ route('register') }}">
                         @csrf
 
@@ -109,8 +110,8 @@
 
                     <!-- Login Link -->
                     <div class="text-center mt-4">
-                        <p class="mb-0">Already have an account? 
-                            <a href="{{ route('login') }}" class="text-primary text-decoration-none">Login</a>
+                        <p class="mb-0">Already have an account?
+                            <a href="{{ route('login') }}" style="color: #0a0a0a"><b>Login</b></a>
                         </p>
                     </div>
                 </div>

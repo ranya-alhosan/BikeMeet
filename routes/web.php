@@ -83,6 +83,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::delete('/UserComments/{id}', [NewsletterController::class, 'destroy'])->name('UserNewsletter.comment.delete');
     Route::patch('/UserComments/{id}', [NewsletterController::class, 'update'])->name('UserNewsletter.comment.update');
     Route::post('/UserNewsletters', [NewsletterController::class, 'store'])->name('UserNewsletter.store');
+    Route::get('/UserNewsletters/search', [NewsletterController::class, 'search'])->name('UserNewsletters.search');
+
 
     Route::get('/profile', [UsersController::class, 'profile'])->name('profile');
     Route::get('/UserProfile/edit', [UsersController::class, 'edit'])->name('UserProfile.edit');

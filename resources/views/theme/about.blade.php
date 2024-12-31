@@ -14,7 +14,7 @@
             <div class="row g-5">
                 <div class="col-lg-6 pt-4" style="min-height: 400px;">
                     <div class="position-relative h-100 wow fadeIn" data-wow-delay="0.1s">
-                        <img class="position-absolute img-fluid w-100 h-100" src="{{asset('assets')}}/img/aboutImage.jpg" style="object-fit: cover;" alt="">
+                        <img class="position-absolute img-fluid w-100 h-100"  src="{{asset('assets')}}/img/home-img.jpg"style="object-fit: cover;" alt="">
                         <div class="position-absolute top-0 end-0 mt-n4 me-n4 py-4 px-5" style="background: rgba(0, 0, 0, .08);">
                             <h1 class="display-4 text-white mb-0">BikeMeet</h1>
                             <h4 class="text-white">The Ultimate Motorcycle Community</h4>
@@ -111,7 +111,7 @@
                 <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
                     <div class="row g-0 about-bg rounded overflow-hidden">
                         <div class="col-6 text-start">
-                            <img class="img-fluid w-100" src="{{asset('assets')}}/img/about4.jpg">
+                            <img class="img-fluid w-100" src="{{asset('assets')}}/img/about4.jpg" >
                         </div>
                         <div class="col-6 text-start">
                             <img class="img-fluid" src="{{asset('assets')}}/img/hero-img.jpg" style="width: 85%;height: 200px; margin-top: 15%;">

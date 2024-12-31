@@ -1,11 +1,30 @@
 @extends('theme.master')
 @section('hero-title', 'Our Latest Newsletters')
+@section('newsletters-active','active')
 
 @section('content')
+    <style>
+        .newsletter-image {
+            width: 100%; /* Makes the image responsive */
+            height: 200px; /* Fixed height */
+            object-fit: cover; /* Ensures the image doesn't stretch */
+            transition: transform 0.3s ease; /* Smooth transition for zoom effect */
+        }
+
+        .newsletter-image:hover {
+            transform: scale(0.9); /* Zoom out on hover */
+            cursor: pointer; /* Change cursor to pointer to indicate it's clickable */
+        }
+
+    </style>
     <div class="container mt-5">
-        <button class="btn btn-primary m-3" data-bs-toggle="modal" data-bs-target="#createNewsletterModal">
-            Add New Newsletter
-        </button>
+        <div class="input-group mb-4">
+            <input type="text" id="newsletterSearch" class="form-control" placeholder="Search newsletters...">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createNewsletterModal">
+                Add New Newsletter
+            </button>
+        </div>
+
         <!-- Modal for Creating New Newsletter -->
         <div class="modal fade" id="createNewsletterModal" tabindex="-1" aria-labelledby="createNewsletterModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -14,7 +33,7 @@
                         <h5 class="modal-title" id="createNewsletterModalLabel">Create New Newsletter</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="{{ route('UserNewsletter.store') }}" method="POST">
+                    <form action="{{ route('UserNewsletter.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
@@ -25,6 +44,10 @@
                                 <label for="content">Content</label>
                                 <textarea name="content" id="content" class="form-control" rows="5" required></textarea>
                             </div>
+                            <div class="form-group mt-3">
+                                <label for="image">Upload Image</label>
+                                <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -34,7 +57,8 @@
                 </div>
             </div>
         </div>
-        @if(session('success'))
+
+    @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
             </div>
@@ -45,113 +69,76 @@
                 <strong>No newsletters available!</strong> Stay tuned for the latest updates.
             </div>
         @else
-            <div class="row row-cols-1 row-cols-md-2 g-4" id="newsletter-results">
+            <div class="container" id="newsletter-results">
                 @foreach($newsletters as $newsletter)
-                    <div class="col">
-                        <div class="card shadow-sm border-0 h-100">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title text-primary fw-bold">{{ $newsletter->title }}</h5>
-                                <p class="card-text text-muted">{{ Str::limit($newsletter->content, 100) }}</p>
-                                <p class="text-muted small mb-3">
-                                    <i class="fas fa-user"></i>
-                                    <strong>Owner:</strong> {{ $newsletter->user->name ?? 'Unknown' }}
-                                    <i class="fas fa-clock"></i>
-                                    <strong>Posted:</strong> {{ $newsletter->created_at->diffForHumans() }}
-                                </p>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-primary fw-bold">{{ $newsletter->title }}</h5>
+                                    <p class="card-text text-muted">{{ Str::limit($newsletter->content, 100) }}</p>
 
-                                <!-- Like Button -->
-                                <form action="{{ route('UserNewsletter.like', $newsletter->id) }}" method="POST"
-                                      class="like-form d-flex align-items-center">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-light shadow-sm me-2">
-                                        <i class="fas fa-heart {{ $newsletter->likes->where('user_id', auth()->id())->count() > 0 ? 'text-danger' : '' }}"></i>
-                                    </button>
-                                    <span class="like-count text-muted">{{ $newsletter->likes->count() }} </span>
-                                </form>
+                                    <p class="text-muted small mb-3">
+                                        <i class="fas fa-user"></i>
+                                        <strong>Owner:</strong> {{ $newsletter->user->name ?? 'Unknown' }}
+                                        <i class="fas fa-clock"></i>
+                                        <strong>Posted:</strong> {{ $newsletter->created_at->diffForHumans() }}
+                                    </p>
 
-                                <!-- Comment Section -->
-                                <div class="comments-section mt-3">
-                                    <button class="btn btn-sm btn-outline-primary show-comment-form">
-                                        <i class="fas fa-comment-alt"></i>
-                                        <span class="comment-count">{{ $newsletter->comments->count() }} comments</span>
-                                    </button>
-                                    <!-- Comment Form (Initially Hidden) -->
-                                    <form action="{{ route('UserNewsletter.comment', $newsletter->id) }}" method="POST"
-                                          class="comment-form d-none mt-3">
+                                        @if($newsletter->image)
+                                        <img src="{{ asset('storage/' . $newsletter->image) }}" alt="Newsletter Image" class="img-fluid mb-3 newsletter-image" >
+                                        @endif
+
+
+                                    <!-- Like Button -->
+                                    <form action="{{ route('UserNewsletter.like', $newsletter->id) }}" method="POST" class="like-form d-flex align-items-center">
                                         @csrf
-                                        <div class="form-group">
-                                            <textarea name="comment" class="form-control form-control-sm"
-                                                      placeholder="Write a comment..." required></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary btn-sm mt-2">Post</button>
+                                        <button type="submit" class="btn btn-sm btn-light shadow-sm me-2">
+                                            <i class="fas fa-heart {{ $newsletter->likes->where('user_id', auth()->id())->count() > 0 ? 'text-danger' : '' }}"></i>
+                                        </button>
+                                        <span class="like-count text-muted">{{ $newsletter->likes->count() }}</span>
                                     </form>
-                                </div>
 
-                                <!-- Comments List -->
-                                <div class="comments-list mt-3">
-                                    @if($newsletter->comments->isEmpty())
-                                        <p class="text-muted small">No comments yet. Be the first to comment!</p>
-                                    @else
-                                        @foreach($newsletter->comments->take(3) as $comment)
-                                            <div
-                                                class="comment border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center"
-                                                data-comment-id="{{ $comment->id }}">
-                                                <div>
-                                                    <strong>{{ $comment->user->name }}</strong>: {{ $comment->comment }}
-                                                    <br>
-                                                    <span class="text-muted small">
-                        <small>{{ $comment->created_at->diffForHumans() }}</small>
-                    </span>
-                                                </div>
-                                                @if(auth()->id() == $comment->user_id)
-                                                    <div>
-                                                        <button
-                                                            class="btn btn-sm btn-outline-secondary edit-comment-btn"
-                                                            data-comment-id="{{ $comment->id }}"
-                                                            data-comment-content="{{ $comment->comment }}">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <form
-                                                            action="{{ route('UserNewsletter.comment.delete', $comment->id) }}"
-                                                            method="POST" class="d-inline delete-comment-form">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit"
-                                                                    class="btn btn-sm btn-outline-danger delete-comment-btn">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                @endif
+                                    <!-- Comment Section -->
+                                    <div class="comments-section mt-3">
+                                        <button class="btn btn-sm btn-outline-primary show-comment-form">
+                                            <i class="fas fa-comment-alt"></i>
+                                            <span class="comment-count">{{ $newsletter->comments->count() }} comments</span>
+                                        </button>
+
+                                        <!-- Comment Form (Initially Hidden) -->
+                                        <form action="{{ route('UserNewsletter.comment', $newsletter->id) }}" method="POST" class="comment-form d-none mt-3">
+                                            @csrf
+                                            <div class="form-group">
+                                                <textarea name="comment" class="form-control form-control-sm" placeholder="Write a comment..." required></textarea>
                                             </div>
-                                        @endforeach
-                                        <div class="hidden-comments" style="display: none;">
-                                            @foreach($newsletter->comments->skip(3) as $comment)
-                                                <div
-                                                    class="comment border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center"
-                                                    data-comment-id="{{ $comment->id }}">
+                                            <button type="submit" class="btn btn-primary btn-sm mt-2">Post</button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Comments List -->
+                                    <div class="comments-list mt-3">
+                                        @if($newsletter->comments->isEmpty())
+                                            <p class="text-muted small">No comments yet. Be the first to comment!</p>
+                                        @else
+                                            @foreach($newsletter->comments->take(3) as $comment)
+                                                <div class="comment border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center" data-comment-id="{{ $comment->id }}">
                                                     <div>
                                                         <strong>{{ $comment->user->name }}</strong>: {{ $comment->comment }}
                                                         <br>
                                                         <span class="text-muted small">
-                            <small>{{ $comment->created_at->diffForHumans() }}</small>
-                        </span>
+                                                <small>{{ $comment->created_at->diffForHumans() }}</small>
+                                            </span>
                                                     </div>
                                                     @if(auth()->id() == $comment->user_id)
                                                         <div>
-                                                            <button
-                                                                class="btn btn-sm btn-outline-secondary edit-comment-btn"
-                                                                data-comment-id="{{ $comment->id }}"
-                                                                data-comment-content="{{ $comment->comment }}">
+                                                            <button class="btn btn-sm btn-outline-secondary edit-comment-btn" data-comment-id="{{ $comment->id }}" data-comment-content="{{ $comment->comment }}">
                                                                 <i class="fas fa-edit"></i>
                                                             </button>
-                                                            <form
-                                                                action="{{ route('UserNewsletter.comment.delete', $comment->id) }}"
-                                                                method="POST" class="d-inline delete-comment-form">
+                                                            <form action="{{ route('UserNewsletter.comment.delete', $comment->id) }}" method="POST" class="d-inline delete-comment-form">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit"
-                                                                        class="btn btn-sm btn-outline-danger delete-comment-btn">
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger delete-comment-btn">
                                                                     <i class="fas fa-trash"></i>
                                                                 </button>
                                                             </form>
@@ -159,21 +146,50 @@
                                                     @endif
                                                 </div>
                                             @endforeach
-                                        </div>
-                                        @if($newsletter->comments->count() > 3)
-                                            <button class="btn btn-link read-more-btn"
-                                                    data-newsletter-id="{{ $newsletter->id }}">Read More
-                                            </button>
+                                            <div class="hidden-comments" style="display: none;">
+                                                @foreach($newsletter->comments->skip(3) as $comment)
+                                                    <div class="comment border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center" data-comment-id="{{ $comment->id }}">
+                                                        <div>
+                                                            <strong>{{ $comment->user->name }}</strong>: {{ $comment->comment }}
+                                                            <br>
+                                                            <span class="text-muted small">
+                                                    <small>{{ $comment->created_at->diffForHumans() }}</small>
+                                                </span>
+                                                        </div>
+                                                        @if(auth()->id() == $comment->user_id)
+                                                            <div>
+                                                                <button class="btn btn-sm btn-outline-secondary edit-comment-btn" data-comment-id="{{ $comment->id }}" data-comment-content="{{ $comment->comment }}">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </button>
+                                                                <form action="{{ route('UserNewsletter.comment.delete', $comment->id) }}" method="POST" class="d-inline delete-comment-form">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit" class="btn btn-sm btn-outline-danger delete-comment-btn">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            @if($newsletter->comments->count() > 3)
+                                                <button class="btn btn-link read-more-btn" data-newsletter-id="{{ $newsletter->id }}">Read More</button>
+                                            @endif
                                         @endif
-                                    @endif
+                                    </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
+
                 @endforeach
+
+
             </div>
+
         @endif
+
     </div>
 
     <div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
@@ -199,6 +215,18 @@
             </div>
         </div>
     </div>
+    <!-- Modal Structure -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" alt="Full-size image" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 @endsection
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -319,4 +347,36 @@
         });
 
     });
+    $(document).ready(function () {
+        $('#newsletterSearch').on('input', function () {
+            let query = $(this).val();
+
+            $.ajax({
+                url: "{{ route('UserNewsletters.search') }}",
+                type: 'GET',
+                data: { query: query },
+                success: function (response) {
+                    $('#newsletter-results').html(response.html);
+                },
+                error: function (xhr) {
+                    console.error('Error:', xhr.responseText);
+                }
+            });
+        });
+    });
+    $(document).ready(function () {
+        // Attach click event listener to images with class 'newsletter-image'
+        $('.newsletter-image').on('click', function () {
+            // Get the source URL of the clicked image
+            const imageUrl = $(this).attr('src');
+
+            // Set the full-size image as the source of the modal
+            $('#modalImage').attr('src', imageUrl);
+
+            // Show the modal using Bootstrap's modal method
+            $('#imageModal').modal('show');
+        });
+    });
+
+
 </script>

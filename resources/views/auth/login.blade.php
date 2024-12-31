@@ -30,11 +30,12 @@
 
         .card-header {
             background-color: transparent;
+
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .form-control {
-            background-color: transparent;
+            background-color: var(--light);
             border-color: rgba(255, 255, 255, 0.3);
             color: var(--light);
         }
@@ -71,11 +72,12 @@
         <div class="row w-100">
             <div class="col-md-6 offset-md-3">
                 <div class="card shadow-lg">
-                    <div class="card-header text-center py-4">
-                        <h3 class="card-title">Login</h3>
-                        <h6>Two wheels, endless possibilities. Let’s get rolling!</h6>
+                    <div class="card-header text-center py-3">
+                        <img src="{{asset('assets')}}/img/logo.png" style="max-width: 200px">
+                        <h3 class="card-title mb-3" ><b>Login</b></h3>
+                        <h6  >Two wheels, endless possibilities. Let’s get rolling!</h6>
                     </div>
-                    <div class="card-body p-5">
+                    <div class="card-body p-4 ">
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
                             <div class="mb-4">
@@ -90,7 +92,7 @@
                                     placeholder="Enter your password" required>
                             </div>
 
-                           
+
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary">Login</button>
@@ -110,7 +112,7 @@
                         <!-- Signup Link -->
                         <div class="text-center mt-4">
                             <p class="mb-0">Don't have an account?
-                                <a href="{{ route('register') }}" class="text-primary text-decoration-none">Sign up</a>
+                                <a href="{{ route('register') }}"  style="color: #0a0a0a"><b>Sign up</b></a>
                             </p>
                         </div>
                     </div>

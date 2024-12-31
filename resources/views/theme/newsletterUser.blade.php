@@ -1,4 +1,5 @@
 @extends('theme.master')
+@section('newsletters-active','active')
 
 @section('content')
     <div class="container mt-5">

@@ -25,7 +25,7 @@
                     <a href="{{ route('rentals.showRentals') }}" class="nav-link @yield('rent-active')">Rents</a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('UserNewsletters.index') }}" class="nav-link @yield('team-active')">Newsletters</a>
+                    <a href="{{ route('UserNewsletters.index') }}" class="nav-link @yield('newsletters-active')">Newsletters</a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('events.UserIndex') }}" class="nav-link @yield('event-active')">Events</a>
