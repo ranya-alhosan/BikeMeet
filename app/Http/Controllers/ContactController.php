@@ -11,13 +11,14 @@ class ContactController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
         $contacts = Contact::all();
-        if ($user->role === 'admin') {
+//        $user = auth()->user();
 
-        return view('dashboard.contacts.index', compact('contacts'));
+//        if ($user->role === 'admin') {
+//        return view('dashboard.contacts.index', compact('contacts'));
+//        }
+//
 
-        }
         return view('theme.contact');
 
     }
@@ -50,7 +51,7 @@ class ContactController extends Controller
         if (auth()->check() && auth()->user()->role === 'admin') {
             return redirect()->route('contacts.index')->with('success', 'Contact created successfully!');
         } else {
-            return redirect()->route('theme.about')->with('success', 'Contact created successfully!');
+            return redirect()->route('about')->with('success', 'Contact created successfully!');
         }
     }
 

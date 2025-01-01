@@ -1,8 +1,4 @@
 <?php
-
-
-
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ThemeController;
@@ -15,43 +11,26 @@ use App\Http\Controllers\MotorcycleController;
 use App\Http\Controllers\EventEnrollmentController;
 use App\Http\Controllers\TestimonialController;
 
+//
+//Route::get('/', function () {
+//    return view('theme.index');
+//})->name('home');
 
-Route::get('/', function () {
-    return view('theme.index');
-})->name('home');
 
-Route::get('/showContacts', [ContactController::class,'index' ])->name('user.showContact');
-Route::post('/UserContacts', [ContactController::class,'store' ])->name('user.storeContact');
-Route::controller(ThemeController::class)->name('theme.')->group(function () {
-    Route::get('/about', 'about')->name('about');
-    Route::get('/testimonial', 'testimonial')->name('testimonial');
-});
-Route::middleware('guest')->group(function () {
-    Route::get('/login', function () {
-        return view('dashboard.login');
-    })->name('login');
-});
+
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard.main');
     })->name('dashboard');
-
     Route::resource('users', UsersController::class);
-
     Route::resource('events', EventController::class);
     Route::resource('enrollment', EventEnrollmentController::class);
-
     Route::resource('rentals',RentalController::class);
     Route::get('/rentals/create', [RentalController::class, 'create'])->name('rentals.create');
-
     Route::resource('motorcycles', MotorcycleController::class);
-
     Route::get('/motorcycles/{userId}', [RentalController::class, 'getMotorcyclesByUser'])->name('motorcycles.by-user');
-
     Route::resource('contacts', ContactController::class);
-
-
     Route::resource('newsletters', NewsletterController::class);
     Route::post('newsletters/{id}/like', [NewsletterController::class, 'like'])->name('newsletters.like');
     Route::post('newsletters/{id}/comment', [NewsletterController::class, 'comment'])->name('newsletters.comment');
@@ -64,11 +43,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 });
 
+
 Route::middleware(['auth', 'role:user'])->group(function () {
-    Route::get('/showRentals', [RentalController::class, 'showRentals'])->name('rentals.showRentals');
     Route::get('/createRentals', [RentalController::class, 'create'])->name('rentals.createRentals');
     Route::post('/storeRentals', [RentalController::class, 'store'])->name('rentals.storeRentals');
-    Route::get('/rentals/{rental}', [RentalController::class, 'show'])->name('rentals.showRentDetails');
     Route::post('/rentals/{rental}/proceed', [RentalController::class, 'proceedToRent'])->name('rentals.proceed');
 
     Route::get('/UserEvents', [EventController::class, 'index'])->name('events.UserIndex');
@@ -101,12 +79,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::delete('/UserMotorcycles/{motorcycle}', [MotorcycleController::class, 'destroy'])->name('UserMotorcycles.destroy');
     Route::post('/UserMotorcycles/store', [MotorcycleController::class, 'store'])->name('UserMotorcycles.store');
 
-
-    Route::get('/', [EventController::class, 'latestEvents'])->name('home');
-
     Route::resource('testimonials', TestimonialController::class);
-    Route::get('/testimonials', [TestimonialController::class, 'showTestimonials'])->name('testimonials.index');
-
 
 });
 
@@ -118,6 +91,20 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('login'); // Redirect to the login page
     })->name('logout');
 });
+
+Route::get('/', [EventController::class, 'latestEvents'])->name('home');
+Route::get('/showContacts', [ContactController::class,'index' ])->name('user.showContact');
+Route::post('/UserContacts', [ContactController::class,'store' ])->name('user.storeContact');
+Route::controller(ThemeController::class)->name('theme.')->group(function () {
+    Route::get('/testimonial', 'testimonial')->name('testimonial');
+});
+Route::get('/login', function () {
+    return view('dashboard.login');
+})->name('login');
+Route::get('/about',[ThemeController::class,'about'])->name('about');
+Route::get('/testimonials', [TestimonialController::class, 'showTestimonials'])->name('testimonials.index');
+Route::get('/showRentals', [RentalController::class, 'showRentals'])->name('rentals.showRentals');
+Route::get('/rentals/{rental}', [RentalController::class, 'show'])->name('rentals.showRentDetails');
 
 
 require __DIR__ . '/auth.php';

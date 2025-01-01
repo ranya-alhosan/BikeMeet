@@ -29,7 +29,7 @@
                     <!-- Filter by Status -->
                     <div class="form-group">
                         <label for="status"  class="mt-2">Rental Status</label>
-                        <select name="status" id="status" class="form-control">
+                        <select name="status" id="status" class="form-select">
                             <option value="">Select Status</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                             <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed

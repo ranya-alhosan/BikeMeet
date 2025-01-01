@@ -10,10 +10,6 @@ use App\Models\Event;
 class ThemeController extends Controller
 {
 
-
-
-
-
     public function about()
     {
         $events = Event::latest()->take(3)->get();
@@ -21,7 +17,6 @@ class ThemeController extends Controller
         $totalRentals = UserRental::count();
         $totalEvents = Event::count();
         $totalNewsletters = Newsletter::count();
-
         return view('theme.about', compact('events','totalUsers', 'totalRentals', 'totalEvents', 'totalNewsletters'));
     }
 

@@ -4,26 +4,9 @@
 @section('rent-active', 'active')
 
 @section('content')
-    @section('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                @if(session('success'))
-                Swal.fire({
-                    title: 'Success!',
-                    text: '{{ session('success') }}',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '{{ route('rentals') }}';
-                    }
-                });
-                @endif
-            });
-        </script>
-    @endsection
-<div class="container mt-4">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <div class="container mt-4">
     <div class="row">
         <div class="col-md-6">
             <!-- Motorcycle Image -->
@@ -49,20 +32,67 @@
 
             <!-- Action Buttons -->
             @if($rental->status === 'available' && $rental->motorcycle->user_id !== auth()->id())
-                <form action="{{ route('rentals.proceed', $rental->id) }}" method="POST" class="d-inline">
+                <form id="rentForm" action="{{ route('rentals.proceed', $rental->id) }}" method="POST" class="d-inline">
                     @csrf
-                    <button type="submit" class="btn btn-primary mt-3">Proceed to Rent</button>
+                    <button type="button" class="btn btn-primary mt-3" id="proceedButton">Proceed to Rent</button>
                 </form>
             @else
                 <p class="text-danger mt-3">Sorry, this motorcycle is not available for rent.</p>
             @endif
+
+            <!-- SweetAlert for Guests -->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                document.getElementById('proceedButton').addEventListener('click', function() {
+                    @if(auth()->guest())
+                    Swal.fire({
+                        title: 'Login Required',
+                        text: 'You must log in to proceed with the rental.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK', // Only the "OK" button is shown
+                    }).then(() => {
+                        // Stay on the same page, no redirection, just close the alert
+                        return;
+                    });
+                    @else
+                    Swal.fire({
+                        title: 'Success!',
+                        text: '{{ session('success') }}',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '{{ route('rentals.showRentals') }}';
+                        }
+                    });
+                    @endif
+                });
+            </script>
 
             <a href="{{ route('rentals.showRentals') }}" class="btn btn-secondary mt-3">Back to Rentals</a>
         </div>
     </div>
 </div>
 
+    @if(session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+            });
+        </script>
+    @endif
 
 
 @endsection
 
+
+
+
+
+{{--@section('scripts')--}}
+{{--    <script>--}}
+{{--        document.addEventListener('DOMContentLoaded', function () {--}}
+{{--           --}}
+{{--        });--}}
+{{--    </script>--}}
+{{--@endsection--}}

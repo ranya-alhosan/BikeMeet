@@ -23,7 +23,7 @@
 
                 <!-- Filter by Status -->
                 <div class="col-md-3">
-                    <select name="status" class="form-control">
+                    <select name="status" class="form-select">
                         <option value="">Filter by Status</option>
                         <option value="upcoming" {{ request()->query('status') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
                         <option value="completed" {{ request()->query('status') == 'completed' ? 'selected' : '' }}>Completed</option>
@@ -32,7 +32,7 @@
 
                 <!-- Filter by Location -->
                 <div class="col-md-3">
-                    <select name="location" class="form-control">
+                    <select name="location" class="form-select">
                         <option value="">Filter by Location</option>
                         @foreach($locations as $location)
                             <option value="{{ $location }}" {{ request()->query('location') == $location ? 'selected' : '' }}>{{ $location }}</option>
@@ -63,11 +63,11 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ $event->name }}</h5>
                                 <p class="card-text">
-                                    <strong>Description:</strong> {{ Str::limit($event->description, 100) }}<br>
+{{--                                    <strong>Description:</strong> {{ Str::limit($event->description, 100) }}<br>--}}
                                     <strong>Location:</strong> {{ $event->location }}<br>
-                                    <strong>Start Date:</strong> {{ $event->start_date->format('F j, Y, g:i a') }}<br>
-                                    <strong>End Date:</strong> {{ $event->end_date->format('F j, Y, g:i a') }}<br>
-                                    <strong>Fee:</strong> ${{ number_format($event->fee, 2) }}<br>
+{{--                                    <strong>Start Date:</strong> {{ $event->start_date->format('F j, Y, g:i a') }}<br>--}}
+{{--                                    <strong>End Date:</strong> {{ $event->end_date->format('F j, Y, g:i a') }}<br>--}}
+{{--                                    <strong>Fee:</strong> ${{ number_format($event->fee, 2) }}<br>--}}
                                     <strong>Organizer:</strong> {{ $event->user->name ?? 'Unknown' }}<br>
                                     <strong>Enrollments:</strong> {{ $event->enrollments_count }}<br> <!-- Add this line -->
                                     @if($event->status === 'upcoming')

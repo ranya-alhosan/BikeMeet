@@ -132,13 +132,15 @@
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="name" name="name" value="{{ auth()->user()->name }}" readonly>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                           value="{{ auth()->check() ? auth()->user()->name : '' }}"
+                                        {{ auth()->check() ? 'readonly' : '' }}>
                                     <label for="name">Your Name</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <select class="form-control" id="role" name="role" required>
+                                    <select class="form-control" id="role" name="role" required {{ auth()->check() ? '' : 'disabled' }}>
                                         <option value="Motorcycle Lover">Motorcycle Lover</option>
                                         <option value="Motorcycle Renter">Motorcycle Renter</option>
                                         <option value="Event Organizer">Event Organizer</option>
@@ -148,15 +150,44 @@
                             </div>
                             <div class="col-12">
                                 <div class="form-floating">
-                                    <textarea class="form-control" id="text" name="text" required></textarea>
+                <textarea class="form-control" id="text" name="text"
+                          {{ auth()->check() ? '' : 'disabled' }}></textarea>
                                     <label for="text">Testimonial</label>
                                 </div>
                             </div>
                             <div class="col-12">
-                                <button class="btn btn-primary w-100 py-3" type="submit">Submit Testimonial</button>
+                                @if(auth()->check())
+                                    <button class="btn btn-primary w-100 py-3" type="submit">Submit Testimonial</button>
+                                @else
+                                    <button class="btn btn-primary w-100 py-3" type="button"
+                                            onclick="showLoginAlert()">Submit Testimonial</button>
+                                @endif
                             </div>
                         </div>
                     </form>
+
+                    <script>
+                        // Show SweetAlert for guest users
+                        function showLoginAlert() {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Login Required',
+                                text: 'You need to log in to submit a testimonial!',
+                                showCancelButton: true, // Show a cancel button
+                                confirmButtonText: 'Log in', // Text for the "Log in" button
+                                cancelButtonText: 'OK', // Text for the "OK" button
+                                confirmButtonColor: '#3085d6', // Color for the "Log in" button
+                                cancelButtonColor: '#d33', // Color for the "OK" button
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    // If "Log in" button is clicked, redirect to the login page
+                                    window.location.href = '{{ route("login") }}';
+                                }
+                                // If "OK" is clicked (or the cancel button), do nothing and stay on the page
+                            });
+                        }
+                    </script>
+
 
                 </div>
             </div>

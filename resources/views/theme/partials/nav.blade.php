@@ -31,7 +31,7 @@
                     <a href="{{ route('events.UserIndex') }}" class="nav-link @yield('event-active')">Events</a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('theme.about') }}" class="nav-link @yield('about-active')">About</a>
+                    <a href="{{ route('about') }}" class="nav-link @yield('about-active')">About</a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('user.showContact') }}" class="nav-link @yield('contact-active')">Contact</a>

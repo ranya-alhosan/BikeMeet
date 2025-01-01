@@ -10,6 +10,11 @@ class TestimonialController extends Controller
     // Store a new testimonial
     public function store(Request $request)
     {
+        // Check if the user is authenticated
+        if (!auth()->check()) {
+            return redirect()->back()->with('error', 'Please log in first to submit a testimonial!');
+        }
+
         // Check if the user already has a testimonial
         $existingTestimonial = Testimonial::where('user_id', auth()->id())->first();
 
@@ -38,6 +43,7 @@ class TestimonialController extends Controller
         // Redirect with a success message
         return redirect()->back()->with('success', 'Testimonial submitted successfully!');
     }
+
 
     public function showTestimonials()
     {
