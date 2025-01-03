@@ -12,12 +12,37 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="text-end">Filters</h5>
                     <!-- Add New Rental Advertisement Icon -->
-                    <a href="{{ route('rentals.createRentals') }}" class="text-primary fs-4" title="Add New Rental Advertisement">
+                    <a href="javascript:void(0);"
+                       id="addRentalIcon"
+                       class="text-primary fs-4"
+                       title="Add New Rental Advertisement">
                         <i class="fas fa-plus"></i> <!-- Font Awesome "+" icon -->
-
                     </a>
                 </div>
-
+                <!-- SweetAlert Script -->
+                <script>
+                    document.getElementById('addRentalIcon').addEventListener('click', function() {
+                        @if(auth()->guest())
+                        Swal.fire({
+                            title: 'Login Required',
+                            text: 'You must log in to add a new rental advertisement.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Login',
+                            cancelButtonText: 'OK',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirect to login page if "Login" is clicked
+                                window.location.href = "{{ route('login') }}";
+                            }
+                            // If "OK" is clicked, nothing happens (stay on the page)
+                        });
+                        @else
+                        // If user is logged in, redirect to the create rentals page
+                        window.location.href = "{{ route('rentals.createRentals') }}";
+                        @endif
+                    });
+                </script>
                 <form action="{{ route('rentals.showRentals') }}" method="GET">
                     <!-- Filter by Make -->
                     <div class="form-group">
@@ -25,7 +50,6 @@
                         <input type="text" name="make" id="make" class="form-control"
                             value="{{ request('make') }}" placeholder="Enter make">
                     </div>
-
                     <!-- Filter by Status -->
                     <div class="form-group">
                         <label for="status"  class="mt-2">Rental Status</label>
@@ -38,7 +62,6 @@
                             </option>
                         </select>
                     </div>
-
                     <!-- Filter by Price Range -->
                     <div class="form-group">
                         <label for="price" class="mt-2">Price Per Day</label>
@@ -53,7 +76,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Filter by Rental Date Range -->
                     <div class="form-group">
                         <label for="dates"  class="mt-2">Rental Dates</label>
@@ -77,8 +99,6 @@
                             <option value="rented" {{ request('rent_status') == 'rented' ? 'selected' : '' }}>Rented</option>
                         </select>
                     </div>
-
-
                     <!-- Apply and Clear Filters -->
                     <div class="d-flex flex-column gap-2 mt-3">
                         <button type="submit" class="btn btn-primary">Apply Filters</button>
@@ -86,16 +106,19 @@
                     </div>
                 </form>
             </div>
-
             <!-- Rentals List Section -->
             <div class="col-md-9">
                 <div class="row">
                     @foreach ($rentals as $rental)
                         <div class="col-md-4 mb-4">
-                            <div class="card shadow">
-                                <img src="{{ $rental->motorcycle && $rental->motorcycle->image ? asset('storage/' . $rental->motorcycle->image) : asset('path/to/default-image.jpg') }}" class="card-img-top" alt="Motorcycle Image">
+                            <div class="card shadow h-100"> <!-- h-100 ensures all cards have the same height -->
+                                <img
+                                    src="{{ $rental->motorcycle && $rental->motorcycle->image ? asset('storage/' . $rental->motorcycle->image) : asset('path/to/default-image.jpg') }}"
+                                    class="card-img-top"
+                                    alt="Motorcycle Image"
+                                    style="height: 200px; object-fit: cover;"> <!-- Fixed height for images -->
 
-                                <div class="card-body">
+                                <div class="card-body d-flex flex-column">
                                     <h5 class="card-title">{{ $rental->motorcycle->make }} {{ $rental->motorcycle->model }}</h5>
                                     <p class="card-text">
                                         <strong>User:</strong> {{ $rental->user->name }} <br>
@@ -105,14 +128,17 @@
                                         {{ \Carbon\Carbon::parse($rental->rental_start_date)->format('M d, Y') }} -
                                         {{ \Carbon\Carbon::parse($rental->rental_end_date)->format('M d, Y') }}
                                     </p>
-                                    <a href="{{ route('rentals.showRentDetails', $rental->id) }}" class="btn btn-primary">Rent Now</a>
+                                    <!-- Spacer div to push the button to the bottom -->
+                                    <div class="mt-auto">
+                                        <a href="{{ route('rentals.showRentDetails', $rental->id) }}" class="btn btn-primary w-100">Rent Now</a>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
                     @endforeach
                 </div>
             </div>
+
         </div>
     </div>
 

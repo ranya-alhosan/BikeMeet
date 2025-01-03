@@ -19,14 +19,12 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $user = auth()->user(); // Get the currently logged-in user
-
-        if ($user->role === 'admin') {
-            // Admin view: Show all events with enrollments count
-            $events = Event::withCount('enrollments')->paginate(10); // Add `withCount` for enrollments
+            $events = Event::withCount('enrollments')->paginate(10);
             return view('dashboard.events.index', compact('events'));
-        }
+    }
 
+    public function indexUser(Request $request)
+    {
         // Get distinct locations for the filter
         $locations = Event::distinct()->pluck('location');
 
@@ -63,7 +61,6 @@ class EventController extends Controller
         // Return the main view
         return view('theme.events.event', compact('events', 'locations'));
     }
-
     public function showDetails($id)
     {
         $event = Event::with('user', 'enrollments')->findOrFail($id);

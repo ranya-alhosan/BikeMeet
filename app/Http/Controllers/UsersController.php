@@ -49,7 +49,7 @@ class UsersController extends Controller
             return view('dashboard.users.edit', compact('user'));
 
         }
-        return view('theme.edit', compact('user'));
+        return view('theme.userProfile.edit', compact('user'));
 
     }
 
@@ -91,16 +91,17 @@ class UsersController extends Controller
 
         // Handle the photo upload if provided
         if ($request->hasFile('image')) {
-            // Delete the old image if it exists
-            if ($user->image && file_exists(storage_path('app/public/' . $user->image))) {
-                unlink(storage_path('app/public/' . $user->image));
+            // Check if the user already has an image
+            if ($user->profile_picture && file_exists(public_path('storage/' . $user->profile_picture))) {
+                // Delete the old image
+                unlink(public_path('storage/' . $user->profile_picture));
             }
 
             // Store the new image
             $imagePath = $request->file('image')->store('profile_images', 'public');
 
             // Update the user's image path in the database
-            $user->update(['image' => $imagePath]);
+            $user->update(['profile_picture' => $imagePath]);
         }
 
         // Redirect based on user role
@@ -110,6 +111,7 @@ class UsersController extends Controller
 
         return redirect()->route('profile')->with('success', 'Profile updated successfully!');
     }
+
 
     public function destroy(User $user)
     {
@@ -122,9 +124,16 @@ class UsersController extends Controller
         // Retrieve the authenticated user
         $user = auth()->user();
 
-        // Return the profile view with user data
-        return view('theme.profile', compact('user'));
+        // Fetch the newsletters the user has authored
+        $newsletters = $user->newsletters()->paginate(10); // Adjust the pagination as needed
+
+        // Count the number of motorcycles the user owns
+        $motorcycleCount = $user->motorcycles()->count(); // Adjust based on your relationship
+
+        // Return the profile view with user data, newsletters, and motorcycle count
+        return view('theme.userProfile.profile', compact('user', 'newsletters', 'motorcycleCount'));
     }
+
 
 
     public function showUserNewsletters()
@@ -137,10 +146,8 @@ class UsersController extends Controller
             ->withCount(['likes', 'comments']) // Add counts for likes and comments
             ->paginate(10);
 
-        return view('theme.newsletterUser', compact('user', 'newsletters'));
+        return view('theme.userProfile.newsletterUser', compact('user', 'newsletters'));
     }
-
-
 
     public function destroyNewsletter($id)
     {
@@ -163,7 +170,6 @@ class UsersController extends Controller
 
     public function updateNewsletter(Request $request, $id)
     {
-
         try {
             $newsletter = Newsletter::findOrFail($id);
 
@@ -176,15 +182,29 @@ class UsersController extends Controller
             $request->validate([
                 'title' => 'required|string|max:255',
                 'content' => 'required|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
+
+            // Handle the image upload if provided
+            if ($request->hasFile('image')) {
+                // Delete the old image if it exists
+                if ($newsletter->image && file_exists(storage_path('app/public/' . $newsletter->image))) {
+                    unlink(storage_path('app/public/' . $newsletter->image));
+                }
+
+                // Store the new image and get its path
+                $imagePath = $request->file('image')->store('newsletters', 'public');
+            }
 
             // Update the newsletter
             $newsletter->update([
                 'title' => $request->input('title'),
                 'content' => $request->input('content'),
+                'image' => $imagePath ?? $newsletter->image, // Keep the old image if no new one is uploaded
             ]);
 
-            return redirect()->route('ProfNewsletters.index')->with('success', 'Newsletter updated successfully!');
+            // Redirect to the user's profile page
+            return redirect()->route('profile', auth()->id())->with('success', 'Newsletter updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'An error occurred while updating the newsletter.');
         }

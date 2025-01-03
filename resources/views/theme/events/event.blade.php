@@ -8,9 +8,29 @@
         <!-- Title and Add Event Button Inline -->
         <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
             <h1>Events</h1>
-            <a href="{{ route('UserEvents.create') }}" class="text-primary fs-4" title="Add New Event">
-                <i class="fas fa-plus"></i>
-              </a>
+            @if(auth()->check())
+                <!-- Authenticated users -->
+                <a href="{{ route('UserEvents.create') }}" class="text-primary fs-4" title="Add New Event">
+                    <i class="fas fa-plus"></i>
+                </a>
+            @else
+                <!-- Guests -->
+                <a href="javascript:void(0);" class="text-primary fs-4" title="Add New Event" onclick="showLoginAlert()">
+                    <i class="fas fa-plus"></i>
+                </a>
+            @endif
+
+            <script>
+                function showLoginAlert() {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Login First',
+                        text: 'You need to login before adding a new event.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            </script>
+
         </div>
 
         <!-- Filter Form -->
@@ -59,17 +79,13 @@
             <div class="row">
                 @foreach($events as $event)
                     <div class="col-md-4 mb-4">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="card event-card h-100"> <!-- Add 'event-card' and 'h-100' -->
+                            <div class="card-body d-flex flex-column"> <!-- Use flexbox for layout -->
                                 <h5 class="card-title">{{ $event->name }}</h5>
                                 <p class="card-text">
-{{--                                    <strong>Description:</strong> {{ Str::limit($event->description, 100) }}<br>--}}
                                     <strong>Location:</strong> {{ $event->location }}<br>
-{{--                                    <strong>Start Date:</strong> {{ $event->start_date->format('F j, Y, g:i a') }}<br>--}}
-{{--                                    <strong>End Date:</strong> {{ $event->end_date->format('F j, Y, g:i a') }}<br>--}}
-{{--                                    <strong>Fee:</strong> ${{ number_format($event->fee, 2) }}<br>--}}
                                     <strong>Organizer:</strong> {{ $event->user->name ?? 'Unknown' }}<br>
-                                    <strong>Enrollments:</strong> {{ $event->enrollments_count }}<br> <!-- Add this line -->
+                                    <strong>Enrollments:</strong> {{ $event->enrollments_count }}<br>
                                     @if($event->status === 'upcoming')
                                         <strong>Status:</strong>
                                         <span class="text-success">Active</span>
@@ -77,13 +93,25 @@
                                         <span class="text-danger">See you soon</span>
                                     @endif
                                 </p>
-
-                                <a href="{{ route('events.showEventDetails', $event->id) }}" class="btn btn-primary">View Details</a>
+                                <div class="mt-auto"> <!-- Push the button to the bottom -->
+                                    <a href="{{ route('events.showEventDetails', $event->id) }}" class="btn btn-primary">View Details</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 @endforeach
             </div>
         @endif
+
     </div>
+    <style>
+        .event-card {
+            height: 100%; /* Ensures cards stretch to match the tallest card */
+        }
+        .event-card .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Ensures spacing is even */
+        }
+    </style>
 @endsection

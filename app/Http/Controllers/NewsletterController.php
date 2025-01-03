@@ -11,23 +11,21 @@ class NewsletterController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-
-        // Check the user's role
-        if ($user->role === 'admin') {
-            // Retrieve newsletters, ordered by the latest created first
-            $newsletters = Newsletter::with(['user', 'likes', 'comments.user'])
+         $newsletters = Newsletter::with(['user', 'likes', 'comments.user'])
                 ->latest() // Orders by created_at in descending order
                 ->get();
             return view('dashboard.newsletters.index', compact('newsletters'));
-        } else {
-            // Retrieve newsletters, ordered by the latest created first
-            $newsletters = Newsletter::with(['user', 'likes', 'comments.user'])
-                ->latest() // Orders by created_at in descending order
-                ->get();
-            return view('theme.newsletters.index', compact('newsletters'));
-        }
-    }public function indexProf()
+
+    }
+
+    public function indexUser(){
+        $newsletters = Newsletter::with(['user', 'likes', 'comments.user'])
+            ->latest() // Orders by created_at in descending order
+            ->get();
+        return view('theme.newsletters.index', compact('newsletters'));
+    }
+
+    public function indexProf()
     {
     // Fetch all newsletters for the authenticated user
     $newsletters = auth()->user()->newsletters; // Assuming the User model has a relationship with Newsletter

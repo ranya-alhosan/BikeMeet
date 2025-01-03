@@ -49,19 +49,16 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('/storeRentals', [RentalController::class, 'store'])->name('rentals.storeRentals');
     Route::post('/rentals/{rental}/proceed', [RentalController::class, 'proceedToRent'])->name('rentals.proceed');
 
-    Route::get('/UserEvents', [EventController::class, 'index'])->name('events.UserIndex');
-    Route::get('/UserEvents/{id}', [EventController::class, 'showDetails'])->name('events.showEventDetails');
-    Route::post('/events/{event}/enroll', [EventController::class, 'enroll'])->name('events.enroll');
-    Route::get('/createEvent', [EventController::class, 'create'])->name('UserEvents.create');
-    Route::post('/UserEvents/store', [EventController::class, 'store'])->name('events.UserStore');
-
-    Route::get('/UserNewsletters', [NewsletterController::class, 'index'])->name('UserNewsletters.index');
     Route::post('/UserNewsletter/{newsletter}/like', [NewsletterController::class, 'like'])->name('UserNewsletter.like');
     Route::post('/UserNewsletter/{newsletter}/comment', [NewsletterController::class, 'comment'])->name('UserNewsletter.comment');
     Route::delete('/UserComments/{id}', [NewsletterController::class, 'destroy'])->name('UserNewsletter.comment.delete');
     Route::patch('/UserComments/{id}', [NewsletterController::class, 'update'])->name('UserNewsletter.comment.update');
     Route::post('/UserNewsletters', [NewsletterController::class, 'store'])->name('UserNewsletter.store');
     Route::get('/UserNewsletters/search', [NewsletterController::class, 'search'])->name('UserNewsletters.search');
+
+    Route::post('/events/{event}/enroll', [EventController::class, 'enroll'])->name('events.enroll');
+    Route::get('/createEvent', [EventController::class, 'create'])->name('UserEvents.create');
+    Route::post('/UserEvents/store', [EventController::class, 'store'])->name('events.UserStore');
 
 
     Route::get('/profile', [UsersController::class, 'profile'])->name('profile');
@@ -105,6 +102,9 @@ Route::get('/about',[ThemeController::class,'about'])->name('about');
 Route::get('/testimonials', [TestimonialController::class, 'showTestimonials'])->name('testimonials.index');
 Route::get('/showRentals', [RentalController::class, 'showRentals'])->name('rentals.showRentals');
 Route::get('/rentals/{rental}', [RentalController::class, 'show'])->name('rentals.showRentDetails');
+Route::get('/UserNewsletters', [NewsletterController::class, 'indexUser'])->name('UserNewsletters.index');
+Route::get('/UserEvents', [EventController::class, 'indexUser'])->name('events.UserIndex');
+Route::get('/UserEvents/{id}', [EventController::class, 'showDetails'])->name('events.showEventDetails');
 
 
 require __DIR__ . '/auth.php';

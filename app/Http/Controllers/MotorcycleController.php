@@ -24,7 +24,7 @@ class MotorcycleController extends Controller
         $user = auth()->user();
         $motorcycles = $user->motorcycles; // Fetch motorcycles associated with the logged-in user
 
-        return view('theme.userMotorcycles', compact('motorcycles'));
+        return view('theme.userProfile.userMotorcycles', compact('motorcycles'));
     }
 
     public function create()
