@@ -110,9 +110,12 @@
                     <i class="bi bi-house"></i> Home
                 </a>
             </li>
-            <a class="nav-link @yield('users-active')" href="{{ route('users.index') }}">
-                <i class="fa-solid fa-user"></i> Users
-            </a>
+            <li class="nav-item  ">
+                <a class="nav-link @yield('users-active')" href="{{ route('users.index') }}">
+                    <i class="fa-solid fa-user"></i> Users
+                </a>
+
+            </li>
 
             <li class="nav-item">
                 <a class="nav-link @yield('events-active')" href="{{ route('events.index') }}">

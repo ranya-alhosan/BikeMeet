@@ -8,7 +8,8 @@
                     <div class="col-md-4 d-flex justify-content-center mb-4">
                         <!-- Profile Image -->
                         <img
-                            src="{{ isset($user->profile_picture) && $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('assets/img/users.png') }}"
+                            src="{{ isset($user->profile_picture) && $user->profile_picture ?
+ asset('storage/' . $user->profile_picture) : asset('assets/img/users.png') }}"
                             class="rounded-circle shadow"
                             style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;"
                             data-bs-toggle="modal"

@@ -10,6 +10,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MotorcycleController;
 use App\Http\Controllers\EventEnrollmentController;
 use App\Http\Controllers\TestimonialController;
+use App\Http\Controllers\DashboardController;
 
 //
 //Route::get('/', function () {
@@ -20,17 +21,25 @@ use App\Http\Controllers\TestimonialController;
 
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard.main');
-    })->name('dashboard');
+//    Route::get('/dashboard', function () {
+//        return view('dashboard.main');
+//    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/api/dashboard-stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
+
     Route::resource('users', UsersController::class);
+
     Route::resource('events', EventController::class);
     Route::resource('enrollment', EventEnrollmentController::class);
+
     Route::resource('rentals',RentalController::class);
     Route::get('/rentals/create', [RentalController::class, 'create'])->name('rentals.create');
-    Route::resource('motorcycles', MotorcycleController::class);
     Route::get('/motorcycles/{userId}', [RentalController::class, 'getMotorcyclesByUser'])->name('motorcycles.by-user');
+
+    Route::resource('motorcycles', MotorcycleController::class);
+
     Route::resource('contacts', ContactController::class);
+
     Route::resource('newsletters', NewsletterController::class);
     Route::post('newsletters/{id}/like', [NewsletterController::class, 'like'])->name('newsletters.like');
     Route::post('newsletters/{id}/comment', [NewsletterController::class, 'comment'])->name('newsletters.comment');
@@ -62,8 +71,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
 
     Route::get('/profile', [UsersController::class, 'profile'])->name('profile');
-    Route::get('/UserProfile/edit', [UsersController::class, 'edit'])->name('UserProfile.edit');
-    Route::put('/UserProfile/update', [UsersController::class, 'update'])->name('UserProfile.update');
+    Route::get('/UserProfile/edit', [UsersController::class, 'UserEdit'])->name('UserProfile.edit');
+    Route::put('/UserProfile/update', [UsersController::class, 'UserUpdate'])->name('UserProfile.update');
     Route::get('/user-newsletters', [UsersController::class, 'showUserNewsletters'])->name('ProfNewsletters.index');
     Route::put('/ProfNewsletters/{id}', [UsersController::class, 'updateNewsletter'])->name('ProfNewsletters.update');
     Route::delete('/ProfNewsletters/{id}', [UsersController::class, 'destroyNewsletter'])->name('ProfNewsletters.destroy');
@@ -87,6 +96,7 @@ Route::middleware('auth')->group(function () {
         request()->session()->regenerateToken(); // Regenerate the CSRF token
         return redirect()->route('login'); // Redirect to the login page
     })->name('logout');
+
 });
 
 Route::get('/', [EventController::class, 'latestEvents'])->name('home');

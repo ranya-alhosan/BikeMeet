@@ -11,11 +11,37 @@ use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all(); // Fetch all users
-        return view('dashboard.users.index', compact('users'));
+        $search = $request->input('search');
+
+        // If search query is provided, perform a filtered search for both users and admins
+        if ($search) {
+            $users = User::where('role', 'user')
+                ->where(function($query) use ($search) {
+                    $query->where('name', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%")
+                        ->orWhere('role', 'like', "%$search%");
+                })
+                ->paginate(10);
+
+            $admins = User::where('role', 'admin')
+                ->where(function($query) use ($search) {
+                    $query->where('name', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%")
+                        ->orWhere('role', 'like', "%$search%");
+                })
+                ->paginate(10);
+        } else {
+            // If no search query, show all users and admins
+            $users = User::where('role', 'user')->paginate(10);
+            $admins = User::where('role', 'admin')->paginate(10);
+        }
+
+        return view('dashboard.users.index', compact('users', 'admins'));
     }
+
+
 
     public function create()
     {
@@ -44,18 +70,63 @@ class UsersController extends Controller
 
     public function edit(User $user)
     {
-        $user = auth()->user();
-        if ($user->role === 'admin') {
             return view('dashboard.users.edit', compact('user'));
 
-        }
+    }
+    public function UserEdit(User $user)
+    {
+
         return view('theme.userProfile.edit', compact('user'));
 
     }
 
     public function update(Request $request, User $user)
     {
-        $user = auth()->user();
+        // Validate the request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed', // For password, 'nullable' allows no change
+            'phone_number' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:100',
+            'region' => 'nullable|string|max:100',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'role' => 'required|in:user,admin,super_admin',
+        ]);
+
+        // Update the user
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->phone_number = $request->input('phone_number');
+        $user->country = $request->input('country');
+        $user->region = $request->input('region');
+        $user->role = $request->input('role');
+
+        // If the password is provided, hash it and update
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->input('password'));
+        }
+
+        // Handle profile picture upload (if any)
+        if ($request->hasFile('profile_picture')) {
+            $image = $request->file('profile_picture');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/profile_pictures'), $imageName);
+            $user->profile_picture = $imageName;
+        }
+
+        // Save the user
+        $user->save();
+
+        // Flash success message and redirect
+        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+    }
+
+
+
+
+    public function UserUpdate(Request $request, User $user)
+    {
 
         // Validate input fields, including photo validation
         $validated = $request->validate([
@@ -104,19 +175,13 @@ class UsersController extends Controller
             $user->update(['profile_picture' => $imagePath]);
         }
 
-        // Redirect based on user role
-        if ($user->role === 'admin') {
-            return redirect()->route('users.index')->with('success', 'User updated successfully!');
-        }
-
         return redirect()->route('profile')->with('success', 'Profile updated successfully!');
     }
-
 
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User deleted successfully!');
+        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 
     public function profile()
