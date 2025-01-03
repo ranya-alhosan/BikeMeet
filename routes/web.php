@@ -30,8 +30,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('users', UsersController::class);
 
     Route::resource('events', EventController::class);
-    Route::resource('enrollment', EventEnrollmentController::class);
     Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+
+    Route::resource('enrollment', EventEnrollmentController::class);
+    Route::get('/enrollment/create', [EventEnrollmentController::class, 'create'])->name('enrollment.create');
+    Route::post('/enrollment', [EventEnrollmentController::class, 'store'])->name('enrollment.store');
 
     Route::resource('rentals',RentalController::class);
     Route::get('/rentals/create', [RentalController::class, 'create'])->name('rentals.create');
