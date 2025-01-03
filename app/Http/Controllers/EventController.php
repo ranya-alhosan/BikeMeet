@@ -19,8 +19,37 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-            $events = Event::withCount('enrollments')->paginate(10);
-            return view('dashboard.events.index', compact('events'));
+        $query = Event::query();
+
+        // Apply filters if available
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('name') && $request->name !== '') {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        if ($request->has('organizer') && $request->organizer !== '') {
+            $query->whereHas('user', function($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->organizer . '%');
+            });
+        }
+
+        // Get filtered events
+        $events = $query->withCount('enrollments')->get();
+
+        return view('dashboard.events.index', compact('events'));
+    }
+
+    public function show(Event $event)
+    {
+        // Eager load enrollments and user details
+        $event->load('enrollments.user');
+
+        return response()->json([
+            'event' => $event
+        ]);
     }
 
     public function indexUser(Request $request)
@@ -113,12 +142,26 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        // Validate the input data
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'end_date' => [
+                'required',
+                'date',
+                'after_or_equal:start_date', // Check that the end date is after or equal to the start date
+                function ($attribute, $value, $fail) use ($request) {
+                    // Ensure that the time of the start date is not equal to the time of the end date
+                    $startDateTime = \Carbon\Carbon::parse($request->start_date);
+                    $endDateTime = \Carbon\Carbon::parse($value);
+
+                    if ($startDateTime->isSameMinute($endDateTime)) {
+                        $fail('The start date and time must not be equal to the end date and time.');
+                    }
+                }
+            ],
             'fee' => 'required|numeric|min:0',
             'status' => 'required|in:upcoming,completed',
         ]);
@@ -134,11 +177,13 @@ class EventController extends Controller
             'status' => $request->status,
             'user_id' => auth()->id(), // Assuming the user creating the event is logged in
         ]);
+
         $user = auth()->user(); // Get the currently logged-in user
 
         if ($user->role === 'admin') {
             return redirect()->route('events.index')->with('success', 'Event created successfully.');
         }
+
         // Redirect to the events index page with success message
         return redirect()->route('events.UserIndex')->with('success', 'Event created successfully.');
     }
@@ -150,6 +195,7 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {
+        // Validate the incoming data
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -160,10 +206,25 @@ class EventController extends Controller
             'status' => 'required|in:upcoming,completed',
         ]);
 
+        // Update the event
         $event->update($validatedData);
+
+        // Check if the event status is 'completed' or if the event's time has passed
+        if ($event->status === 'completed' || now()->greaterThanOrEqualTo($event->end_date)) {
+            // Update the status of all associated event enrollments to 'completed'
+            $event->enrollments()->update(['status' => 'completed']);
+        }
+
+        // If the status changes from 'completed' to 'upcoming', reset enrollment statuses
+        if ($event->status === 'upcoming' && $event->wasChanged('status')) {
+            // Reset the enrollment statuses to 'pending' or 'confirmed'
+            $event->enrollments()->update(['status' => 'pending']);
+        }
 
         return redirect()->route('events.index')->with('success', 'Event updated successfully!');
     }
+
+
 
     public function destroy(Event $event)
     {

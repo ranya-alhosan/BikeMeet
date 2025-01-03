@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::resource('events', EventController::class);
     Route::resource('enrollment', EventEnrollmentController::class);
+    Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 
     Route::resource('rentals',RentalController::class);
     Route::get('/rentals/create', [RentalController::class, 'create'])->name('rentals.create');
