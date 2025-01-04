@@ -66,9 +66,16 @@
                             <img src="{{ asset('storage/' . $motorcycle->image) }}" class="card-img-top mb-3" alt="Motorcycle Image" style="height: 200px; object-fit: cover;">
 
                             <p class="card-text"><b>Owner:</b> {{ $motorcycle->user->name ?? 'N/A' }}</p>
-                            <p class="card-text"><b>Description</b> :{{ $motorcycle->description }}</p>
+                            <p class="card-text"><b>Description:</b> {{ $motorcycle->description }}</p>
 
-                            <!-- No need for extra buttons here since options are in dropdown -->
+                            <!-- Add Year, Price Per Day, and Availability Status -->
+                            <p class="card-text"><b>Year:</b> {{ $motorcycle->year }}</p>
+                            <p class="card-text"><b>Price Per Day:</b> ${{ number_format($motorcycle->price_per_day, 2) }}</p>
+                            <p class="card-text"><b>Availability:</b>
+                                <span class="badge {{ $motorcycle->availability_status == 'available' ? 'bg-success' : 'bg-danger' }}">
+                            {{ ucfirst($motorcycle->availability_status) }}
+                        </span>
+                            </p>
                         </div>
                     </div>
                 </div>

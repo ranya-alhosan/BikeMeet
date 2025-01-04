@@ -41,7 +41,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/motorcycles/{userId}', [RentalController::class, 'getMotorcyclesByUser'])->name('motorcycles.by-user');
 
-    Route::resource('motorcycles', MotorcycleController::class);
+    Route::get('/motorcycles', [MotorcycleController::class, 'index'])->name('motorcycles.index');
+    Route::get('/motorcycles/dashboard/create', [MotorcycleController::class, 'create'])->name('motorcycles.create');
+    Route::post('/motorcycles', [MotorcycleController::class, 'store'])->name('motorcycles.store');
+    Route::get('/motorcycles/{motorcycle}', [MotorcycleController::class, 'show'])->name('motorcycles.show');
+    Route::get('/motorcycles/{motorcycle}/edit', [MotorcycleController::class, 'edit'])->name('motorcycles.edit');
+    Route::put('/motorcycles/{motorcycle}', [MotorcycleController::class, 'update'])->name('motorcycles.update');
+    Route::delete('/motorcycles/{motorcycle}', [MotorcycleController::class, 'destroy'])->name('motorcycles.destroy');
 
     Route::resource('contacts', ContactController::class);
 
@@ -89,7 +95,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/UserMotorcycles/{motorcycle}/edit', [MotorcycleController::class, 'edit'])->name('UserMotorcycles.edit');
     Route::put('/UserMotorcycles/{motorcycle}', [MotorcycleController::class, 'updateMotor'])->name('UserMotorcycles.update');
     Route::delete('/UserMotorcycles/{motorcycle}', [MotorcycleController::class, 'destroy'])->name('UserMotorcycles.destroy');
-    Route::post('/UserMotorcycles/store', [MotorcycleController::class, 'store'])->name('UserMotorcycles.store');
+    Route::post('/UserMotorcycles/store', [MotorcycleController::class, 'UserStore'])->name('UserMotorcycles.store');
 
     Route::resource('testimonials', TestimonialController::class);
 

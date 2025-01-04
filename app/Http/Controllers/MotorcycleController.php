@@ -37,10 +37,6 @@ class MotorcycleController extends Controller
         return view('dashboard.motorcycles.index', compact('motorcycles'));
     }
 
-
-
-
-
     public function userMotorcycles()
     {
         $user = auth()->user();
@@ -49,14 +45,40 @@ class MotorcycleController extends Controller
         return view('theme.userProfile.userMotorcycles', compact('motorcycles'));
     }
 
+
     public function create()
     {
-        // Get all users except the current logged-in user, so the motorcycle isn't assigned to them by mistake
         $users = User::all();
         return view('dashboard.motorcycles.create', compact('users'));
     }
 
+
+
+    // Handle storing the new motorcycle
     public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id', // Ensure user_id exists in the users table
+            'make' => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'year' => 'required|integer',
+            'price_per_day' => 'required|numeric',
+            'availability_status' => 'required|string|in:available,unavailable',
+            'description' => 'nullable|string',
+            'image' => 'required|image|max:2048', // Image upload validation
+        ]);
+
+        // Handle image upload if provided
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('motorcycle_images', 'public');
+        }
+
+        Motorcycle::create($validated);
+
+        return redirect()->route('motorcycles.index')->with('success', 'Motorcycle created and assigned to the user successfully!');
+    }
+
+    public function UserStore(Request $request)
     {
         // Validate input
         $request->validate([
@@ -87,14 +109,15 @@ class MotorcycleController extends Controller
             'description' => $request->description,
             'image' => $imagePath,
         ]);
-        $user = auth()->user();
-        if ($user->role === 'admin') {
-
-        return redirect()->route('motorcycles.index')->with('success', 'Motorcycle added successfully');
-        }
+//        $user = auth()->user();
+//        if ($user->role === 'admin') {
+//
+//            return redirect()->route('motorcycles.index')->with('success', 'Motorcycle added successfully');
+//        }
         return redirect()->back()->with('success', 'Motorcycle added successfully!');
 
     }
+
 
 
     public function edit(Motorcycle $motorcycle)

@@ -79,8 +79,8 @@
                     <option value="available" {{ old('availability_status', $motorcycle->availability_status) == 'available' ? 'selected' : '' }}>
                         Available
                     </option>
-                    <option value="unavailable" {{ old('availability_status', $motorcycle->availability_status) == 'unavailable' ? 'selected' : '' }}>
-                        Unavailable
+                    <option value="under_maintenance" {{ old('availability_status', $motorcycle->availability_status) == 'under_maintenance' ? 'selected' : '' }}>
+                        Under Maintenance
                     </option>
                 </select>
             </div>
@@ -116,5 +116,6 @@
 
             <button type="submit" class="btn btn-primary">Update Motorcycle</button>
         </form>
+
     </div>
 @endsection
