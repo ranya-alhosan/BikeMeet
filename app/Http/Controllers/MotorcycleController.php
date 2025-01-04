@@ -10,14 +10,36 @@ use Illuminate\Support\Facades\Storage;
 
 class MotorcycleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch all motorcycles from the database
-        $motorcycles = Motorcycle::all();
+        $query = Motorcycle::query();
 
-        // Return the view with motorcycles data
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('make', 'like', '%' . $request->search . '%')
+                    ->orWhere('model', 'like', '%' . $request->search . '%')
+                    ->orWhere('description', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('user', function ($userQuery) use ($request) {
+                        $userQuery->where('name', 'like', '%' . $request->search . '%');
+                    });
+            });
+        }
+
+        // Filter by availability_status
+        if ($request->has('availability_status') && !empty($request->availability_status)) {
+            $query->where('availability_status', $request->availability_status);
+        }
+
+        // Paginate results
+        $motorcycles = $query->paginate(6);
+
         return view('dashboard.motorcycles.index', compact('motorcycles'));
     }
+
+
+
+
 
     public function userMotorcycles()
     {
