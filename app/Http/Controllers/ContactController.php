@@ -11,17 +11,17 @@ class ContactController extends Controller
      */
     public function index()
     {
-        $contacts = Contact::all();
-//        $user = auth()->user();
 
-//        if ($user->role === 'admin') {
-//        return view('dashboard.contacts.index', compact('contacts'));
-//        }
-//
-
-        return view('theme.contact');
+        $contacts = Contact::paginate(10); // Paginate with 10 items per page
+        return view('dashboard.contacts.index', compact('contacts'));
 
     }
+
+    public function UserIndex()
+    {
+        return view('theme.contact');
+    }
+
 
     /**
      * Show the form for creating a new contact.

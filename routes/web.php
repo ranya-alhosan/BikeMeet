@@ -106,7 +106,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/', [EventController::class, 'latestEvents'])->name('home');
-Route::get('/showContacts', [ContactController::class,'index' ])->name('user.showContact');
+Route::get('/showContacts', [ContactController::class,'UserIndex' ])->name('user.showContact');
 Route::post('/UserContacts', [ContactController::class,'store' ])->name('user.storeContact');
 Route::controller(ThemeController::class)->name('theme.')->group(function () {
     Route::get('/testimonial', 'testimonial')->name('testimonial');

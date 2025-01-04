@@ -2,8 +2,9 @@
 
 @section('content')
 <div class="container">
-    <h1>Contacts</h1>
-    <a href="{{ route('contacts.create') }}" class="btn btn-primary mb-3">Create New Contact</a>
+    <h1 class="h3 mb-4 mt-4">Contacts</h1>
+
+    {{--    <a href="{{ route('contacts.create') }}" class="btn btn-primary mb-3">Create New Contact</a>--}}
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -11,7 +12,7 @@
                 <th>Email</th>
                 <th>Subject</th>
                 <th>Message</th>
-                <th>Actions</th>
+{{--                <th>Actions</th>--}}
 
             </tr>
         </thead>
@@ -22,18 +23,22 @@
                     <td>{{ $contact->email }}</td>
                     <td>{{ $contact->subject }}</td>
                     <td>{{ $contact->message }}</td>
-                    <td>
+{{--                    <td>--}}
 {{--                        <a href="{{ route('contacts.show', $contact->id) }}" class="btn btn-info btn-sm">View</a>--}}
-                        <a href="{{ route('contacts.edit', $contact->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                        <form action="{{ route('contacts.destroy', $contact->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
-                    </td>
+{{--                        <a href="{{ route('contacts.edit', $contact->id) }}" class="btn btn-warning btn-sm">Edit</a>--}}
+{{--                        <form action="{{ route('contacts.destroy', $contact->id) }}" method="POST" class="d-inline">--}}
+{{--                            @csrf--}}
+{{--                            @method('DELETE')--}}
+{{--                            <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>--}}
+{{--                        </form>--}}
+{{--                    </td>--}}
                 </tr>
             @endforeach
         </tbody>
     </table>
+    <!-- Pagination Links -->
+    <div class="d-flex justify-content-center">
+        {{ $contacts->links() }}
+    </div>
 </div>
 @endsection
