@@ -38,6 +38,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::resource('rentals',RentalController::class);
     Route::get('/rentals/create', [RentalController::class, 'create'])->name('rentals.create');
+
     Route::get('/motorcycles/{userId}', [RentalController::class, 'getMotorcyclesByUser'])->name('motorcycles.by-user');
 
     Route::resource('motorcycles', MotorcycleController::class);

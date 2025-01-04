@@ -13,9 +13,39 @@ class RentalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rentals = Rental::with('user', 'motorcycle')->get();
+        // Query the rentals table with relationships
+        $query = Rental::with('user', 'motorcycle');
+
+        // Apply filters if they exist
+        if ($request->has('motorcycle_name') && !empty($request->motorcycle_name)) {
+            $query->whereHas('motorcycle', function ($q) use ($request) {
+                $q->where('make', 'like', '%' . $request->motorcycle_name . '%')
+                    ->orWhere('model', 'like', '%' . $request->motorcycle_name . '%');
+            });
+        }
+
+        if ($request->has('owner_name') && !empty($request->owner_name)) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->owner_name . '%');
+            });
+        }
+
+        if ($request->has('rental_start_date') && !empty($request->rental_start_date)) {
+            $query->whereDate('rental_start_date', '>=', $request->rental_start_date);
+        }
+
+        if ($request->has('rental_end_date') && !empty($request->rental_end_date)) {
+            $query->whereDate('rental_end_date', '<=', $request->rental_end_date);
+        }
+
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        // Get the filtered rentals with pagination
+        $rentals = $query->paginate(10); // 10 items per page
 
         return view('dashboard.rentals.index', compact('rentals'));
     }

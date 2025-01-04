@@ -54,19 +54,35 @@
     <script>
         function updateMotorcycles() {
             const userId = document.getElementById('user_id').value;
-            fetch(`/motorcycles?user_id=${userId}`)
-                .then(response => response.json())
-                .then(motorcycles => {
-                    const motorcycleSelect = document.getElementById('motorcycle_id');
-                    motorcycleSelect.innerHTML = ''; // Clear the existing options
+            const motorcycleSelect = document.getElementById('motorcycle_id');
+            motorcycleSelect.innerHTML = '<option>Loading...</option>'; // Show loading message
 
-                    motorcycles.forEach(motorcycle => {
-                        const option = document.createElement('option');
-                        option.value = motorcycle.id;
-                        option.textContent = `${motorcycle.make} ${motorcycle.model}`;
-                        motorcycleSelect.appendChild(option);
-                    });
+            fetch(`/motorcycles/${userId}`) // Use the dynamic route with userId
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    motorcycleSelect.innerHTML = ''; // Clear existing options
+                    if (data.motorcycles && data.motorcycles.length > 0) {
+                        data.motorcycles.forEach(motorcycle => {
+                            const option = document.createElement('option');
+                            option.value = motorcycle.id;
+                            option.textContent = `${motorcycle.make} ${motorcycle.model}`;
+                            motorcycleSelect.appendChild(option);
+                        });
+                    } else {
+                        motorcycleSelect.innerHTML = '<option>No motorcycles available</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching motorcycles:', error);
+                    motorcycleSelect.innerHTML = '<option>Error loading motorcycles</option>';
                 });
         }
+
+
     </script>
 @endsection
