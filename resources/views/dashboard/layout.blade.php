@@ -128,7 +128,11 @@
                     <i class="bi bi-calendar-event"></i>Enrollment Events
                 </a>
             </li>
-
+            <li class="nav-item">
+                <a class="nav-link " href="{{ route('motorcycles.index') }}">
+                    <i class="fas fa-motorcycle"></i> Motorcycles
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link @yield('rents-active')" href="{{ route('rentals.index') }}">
                     <i class="fas fa-motorcycle"></i>Rent Motorcycles
@@ -144,11 +148,7 @@
                     <i class="fa-solid fa-address-book"></i> Contacts
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link " href="{{ route('motorcycles.index') }}">
-                    <i class="fas fa-motorcycle"></i> Motorcycles
-                </a>
-            </li>
+
             <li class="nav-item">
                 <form action="{{ route('logout') }}" method="POST" id="logout-form">
                     @csrf
