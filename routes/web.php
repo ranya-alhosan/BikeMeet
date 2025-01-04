@@ -46,6 +46,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('contacts', ContactController::class);
 
     Route::resource('newsletters', NewsletterController::class);
+
     Route::post('newsletters/{id}/like', [NewsletterController::class, 'like'])->name('newsletters.like');
     Route::post('newsletters/{id}/comment', [NewsletterController::class, 'comment'])->name('newsletters.comment');
     Route::delete('/DashNewsletters/{newsletter}', [NewsletterController::class, 'destroyNews'])->name('DashNewsletters.destroy');

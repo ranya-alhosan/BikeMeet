@@ -2,19 +2,36 @@
 
 @section('content')
     <div class="container mt-5">
+        <h1 class="h3  mb-3">Newsletters Details</h1>
         <div class="card shadow">
+
+
             <div class="card-body">
                 <!-- Newsletter Title -->
                 <h1 class="card-title text-primary">{{ $newsletter->title }}</h1>
 
+
+
                 <!-- Newsletter Content -->
                 <p class="card-text mt-3">{{ $newsletter->content }}</p>
-
+                <!-- Newsletter Image -->
+                @if ($newsletter->image)
+                    <div class="mt-3">
+                        <img src="{{ asset('storage/' . $newsletter->image) }}" alt="Newsletter Image" class="img-fluid">
+                    </div>
+                @endif
                 <!-- Likes Count -->
                 <div class="d-flex align-items-center mt-4">
-                    <i class="fas fa-thumbs-up text-success me-2"></i>
-                    <h4 class="m-0">Likes: <span class="text-dark">{{ $likes->count() }}</span></h4>
+                    <i class="fas fa-thumbs-up text-success me-2" style="font-size: 20px"></i>
+                    <h5 class="m-0"><span class="text-dark">{{ $likes->count() }}</span></h5>
+
+                    <!-- Add space between Likes and Comments -->
+                    <div class="ms-4 d-flex align-items-center">
+                        <i class="fas fa-comment-alt text-success me-2"></i>
+                        <h5 class="m-0"><span class="text-dark">{{ $comments->count() }}</span></h5>
+                    </div>
                 </div>
+
             </div>
         </div>
 
@@ -45,7 +62,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this comment?')">
-                                                <i class="fas fa-trash"></i> Delete
+                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
                                     @endif
@@ -57,6 +74,11 @@
                             </div>
                         @endforeach
                     @endforeach
+                </div>
+
+                <!-- Pagination Links -->
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $comments->links() }}
                 </div>
             @endif
         </div>

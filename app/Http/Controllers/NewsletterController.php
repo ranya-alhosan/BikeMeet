@@ -9,13 +9,21 @@ use Illuminate\Http\Request;
 
 class NewsletterController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-         $newsletters = Newsletter::with(['user', 'likes', 'comments.user'])
-                ->latest() // Orders by created_at in descending order
-                ->get();
-            return view('dashboard.newsletters.index', compact('newsletters'));
+        $search = $request->input('search');
+        $newsletters = Newsletter::with(['user', 'likes', 'comments.user'])
+            ->when($search, function ($query, $search) {
+                return $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
+                    });
+            })
+            ->latest() // Orders by created_at in descending order
+            ->paginate(10); // Set the number of items per page
 
+        return view('dashboard.newsletters.index', compact('newsletters'));
     }
 
     public function indexUser(){
@@ -33,7 +41,6 @@ class NewsletterController extends Controller
     // Return the view with the newsletters data
     return view('theme.newsletterUser', compact('newsletters'));
    }
-
 
     // Like a newsletter
     public function like(Newsletter $newsletter)
@@ -176,7 +183,7 @@ class NewsletterController extends Controller
     {
         $user = auth()->user();
         $newsletter = Newsletter::findOrFail($id);
-        $comments = $newsletter->comments()->with('user')->get();
+        $comments = $newsletter->comments()->latest()->paginate(10); // Paginate comments
         $likes = $newsletter->likes;
 
 
@@ -248,20 +255,33 @@ class NewsletterController extends Controller
 
     public function DashStore(Request $request)
     {
+        // Validate the incoming request
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate the image
         ]);
 
-        // Create the new newsletter
+        // Initialize the imagePath variable to null in case no image is uploaded
+        $imagePath = null;
+
+        // Check if an image file is uploaded
+        if ($request->hasFile('image')) {
+            // Store the image and get its path
+            $imagePath = $request->file('image')->store('newsletters', 'public'); // Store in 'newsletters' folder
+        }
+
+        // Add the authenticated user's ID to the validated data
         $validatedData['user_id'] = auth()->id(); // Store the authenticated user's ID
+        $validatedData['image'] = $imagePath; // Add the image path to the data
 
         // Create a new newsletter with the validated data
         Newsletter::create($validatedData);
 
-        // Redirect to the newsletters index with a success message
+        // Redirect back to the newsletters index with a success message
         return redirect()->route('newsletters.index')->with('success', 'Newsletter created successfully!');
     }
+
 
     public function search(Request $request)
     {

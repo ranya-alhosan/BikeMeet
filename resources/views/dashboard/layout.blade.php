@@ -136,7 +136,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link @yield('news-active')" href="{{ route('newsletters.index') }}">
-                    <i class="bi bi-newspaper"></i> News
+                    <i class="bi bi-newspaper"></i> Newsletters
                 </a>
             </li>
             <li class="nav-item">
