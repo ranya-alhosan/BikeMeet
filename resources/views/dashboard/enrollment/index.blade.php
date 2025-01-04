@@ -2,17 +2,21 @@
 
 @section('content')
     <div class="container my-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <!-- Display Success Message -->
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
+        <!-- Title and Add Event Button -->
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
             <h1 class="h3">Enrollment Management</h1>
             <a href="{{ route('enrollment.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Add Enrollment
             </a>
         </div>
+        <hr>
 
-
-    @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
 
         <!-- Filter Form -->
         <form action="{{ route('enrollment.index') }}" method="GET" class="mb-4 mt-4">

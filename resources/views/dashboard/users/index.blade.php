@@ -4,8 +4,6 @@
 
 @section('content')
     <div class="container">
-        <h1 class="mt-4">User & Admin Management</h1>
-
         <!-- Success and Danger messages -->
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -13,6 +11,17 @@
         @if(session('danger'))
             <div class="alert alert-danger">{{ session('danger') }}</div>
         @endif
+
+
+        <!-- Title and Add user Button -->
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+            <h1 class="h3">User & Admin Management</h1>
+            <a href="{{ route('users.create') }}"  class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New User
+            </a>
+        </div>
+        <hr>
+
 
         <!-- Search Form and Add New User Button -->
         <form method="GET" action="{{ route('users.index') }}" class="mt-4">
@@ -36,10 +45,6 @@
                 <!-- Clear Button -->
                 <div class="col-md-2">
                     <a href="{{ route('users.index') }}" class="btn btn-secondary w-100">Clear</a>
-                </div>
-                <!-- Add New User Button -->
-                <div class="col-md-2 text-end">
-                    <a href="{{ route('users.create') }}" class="btn btn-success w-100">Add New User</a>
                 </div>
             </div>
         </form>

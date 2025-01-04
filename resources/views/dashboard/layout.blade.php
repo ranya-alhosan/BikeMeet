@@ -48,6 +48,11 @@
             background-color: var(--primary);
             color: white;
         }
+        .sidebar .nav-link.active {
+            background-color: var(--primary);  /* Change background for active link */
+            color: white;  /* Change text color for active link */
+        }
+
 
         .content-wrapper {
             margin-left: 250px;
@@ -105,49 +110,57 @@
     <div class="sidebar">
         <img src="{{ asset('assets') }}/img/logo-dashboard.png" height="150px" width="250px">
         <ul class="nav flex-column">
-            <li class="nav-item  ">
-                <a class="nav-link @yield('home-active')" href="/dashboard">
+            <li class="nav-item">
+                <a class="nav-link {{ Request::is('admin/profile') ? 'active' : '' }}" href="{{route('admin.profile')}}">
+                    <i class="fa-solid fa-user"></i> Admin Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}" href="/dashboard">
                     <i class="bi bi-house"></i> Home
                 </a>
             </li>
-            <li class="nav-item  ">
-                <a class="nav-link @yield('users-active')" href="{{ route('users.index') }}">
-                    <i class="fa-solid fa-user"></i> Users
-                </a>
-
-            </li>
-
             <li class="nav-item">
-                <a class="nav-link @yield('events-active')" href="{{ route('events.index') }}">
+                <a class="nav-link {{ Request::is('users*') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                    <i class="fa-regular fa-address-card"></i> Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ Request::is('events*') ? 'active' : '' }}" href="{{ route('events.index') }}">
                     <i class="bi bi-calendar-event"></i> Events
                 </a>
             </li>
-
             <li class="nav-item">
-                <a class="nav-link @yield('events-active')" href="{{ route('enrollment.index') }}">
-                    <i class="bi bi-calendar-event"></i>Enrollment Events
+                <a class="nav-link {{ Request::is('enrollment*') ? 'active' : '' }}" href="{{ route('enrollment.index') }}">
+                    <i class="fa-regular fa-calendar-days"></i> Enrollment Events
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('motorcycles.index') }}">
+                <a class="nav-link {{ Request::is('motorcycles*') ? 'active' : '' }}" href="{{ route('motorcycles.index') }}">
                     <i class="fas fa-motorcycle"></i> Motorcycles
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link @yield('rents-active')" href="{{ route('rentals.index') }}">
-                    <i class="fas fa-motorcycle"></i>Rent Motorcycles
+                <a class="nav-link {{ Request::is('rentals*') ? 'active' : '' }}" href="{{ route('rentals.index') }}">
+                    <i class="fas fa-motorcycle"></i> Rent Motorcycles
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link @yield('news-active')" href="{{ route('newsletters.index') }}">
+                <a class="nav-link {{ Request::is('newsletters*') ? 'active' : '' }}" href="{{ route('newsletters.index') }}">
                     <i class="bi bi-newspaper"></i> Newsletters
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link @yield('news-active')" href="{{ route('contacts.index') }}">
+                <a class="nav-link {{ Request::is('admin/testimonials*') ? 'active' : '' }}" href="{{ route('admin.testimonials') }}">
+                    <i class="fa-regular fa-comment-dots"></i> Testimonials
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ Request::is('contacts*') ? 'active' : '' }}" href="{{ route('contacts.index') }}">
                     <i class="fa-solid fa-address-book"></i> Contacts
                 </a>
             </li>
+
 
             <li class="nav-item">
                 <form action="{{ route('logout') }}" method="POST" id="logout-form">

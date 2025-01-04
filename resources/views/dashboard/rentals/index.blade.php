@@ -4,6 +4,12 @@
 
 @section('content')
     <div class="container">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
             <h1 class="h3">Rentals Management</h1>
             <a href="{{ route('rentals.create') }}" class="btn btn-primary">
@@ -11,11 +17,7 @@
             </a>
         </div>
 
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+
 
         <hr>
 

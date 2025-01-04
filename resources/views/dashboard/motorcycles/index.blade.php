@@ -2,13 +2,6 @@
 
 @section('content')
     <div class="container mt-2">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3">Motorcycles Management</h1>
-            <a href="{{ route('motorcycles.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Add New Motorcycle
-            </a>
-        </div>
-
         <!-- Success Message -->
         @if (session()->has('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -16,6 +9,15 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
+
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+            <h1 class="h3">Motorcycles Management</h1>
+            <a href="{{ route('motorcycles.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Motorcycle
+            </a>
+        </div>
+
+
 
         <hr>
         <!-- Search and Filter Form -->

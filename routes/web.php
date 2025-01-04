@@ -11,6 +11,7 @@ use App\Http\Controllers\MotorcycleController;
 use App\Http\Controllers\EventEnrollmentController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AdminController;
 
 //
 //Route::get('/', function () {
@@ -31,7 +32,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::resource('events', EventController::class);
     Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
-
     Route::resource('enrollment', EventEnrollmentController::class);
     Route::get('/enrollment/create', [EventEnrollmentController::class, 'create'])->name('enrollment.create');
     Route::post('/enrollment', [EventEnrollmentController::class, 'store'])->name('enrollment.store');
@@ -62,6 +62,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/DashNewsletters/create', [NewsletterController::class, 'DashCreate'])->name('DashNewsletters.create');
     Route::post('/DashNewsletters', [NewsletterController::class, 'DashStore'])->name('DashNewsletters.store');
 
+    Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');
+    Route::post('/admin/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
+
+    Route::get('/admin/testimonials', [TestimonialController::class, 'index'])->name('admin.testimonials');
+    Route::post('/admin/testimonials/{testimonial}/update-status', [TestimonialController::class, 'updateStatus'])->name('admin.testimonials.updateStatus');
 });
 
 

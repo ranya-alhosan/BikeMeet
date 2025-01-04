@@ -12,8 +12,6 @@
             </div>
         @endif
 
-
-
         <!-- Title and Add Event Button -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h3">Event Management</h1>

@@ -7,6 +7,29 @@ use Illuminate\Http\Request;
 
 class TestimonialController extends Controller
 {
+
+    public function index()
+    {
+        // Fetch all testimonials, including their status
+        $testimonials = Testimonial::all();
+
+        return view('dashboard.testimonials.index', compact('testimonials'));
+    }
+
+    public function updateStatus(Request $request, Testimonial $testimonial)
+    {
+        $this->validate($request, [
+            'status' => 'required|in:Accept,Reject',
+        ]);
+
+        // Update the testimonial status
+        $testimonial->status = $request->status;
+        $testimonial->save();
+
+        // Redirect back with a success message
+        return redirect()->route('admin.testimonials')->with('success', 'Testimonial status updated!');
+    }
+
     // Store a new testimonial
     public function store(Request $request)
     {

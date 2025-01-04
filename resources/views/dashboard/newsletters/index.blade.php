@@ -2,7 +2,12 @@
 
 @section('content')
     <div class="container">
-
+        <!-- Display success message if it exists -->
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
         <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
             <h1 class="h3">Newsletters Management</h1>
@@ -10,12 +15,7 @@
                 <i class="fas fa-plus"></i> Create New Newsletter
             </a>
         </div>
-        <!-- Display success message if it exists -->
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+
         <hr>
 
         <!-- Search form with clear button on the same line -->
