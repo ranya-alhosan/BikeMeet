@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Newsletter;
 use App\Models\NewsletterLike;
 use App\Models\NewsletterComment;
-
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -118,58 +118,59 @@ class UsersController extends Controller
 
 
 
-    public function UserUpdate(Request $request, User $user)
+    public function UserUpdate(Request $request)
     {
-
-        // Validate input fields, including photo validation
-        $validated = $request->validate([
+        // Validate input fields
+        $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone_number' => 'nullable|string|max:15',
-            'country' => 'nullable|string|max:100',
-            'region' => 'nullable|string|max:100',
-            'current_password' => 'nullable|required_with:password|string',
-            'password' => 'nullable|string|min:8|confirmed',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'email' => 'required|string|email|max:255',
+            'phone_number' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'current_password' => 'nullable|string|min:8',
+            'password' => 'nullable|string|min:8|confirmed|different:current_password',
         ]);
 
-        // Verify the current password
-        if (!empty($validated['current_password']) && !\Hash::check($validated['current_password'], $user->password)) {
-            return back()->withErrors(['current_password' => 'The current password is incorrect.']);
-        }
+        // Get the current authenticated user
+        $user = auth()->user();
 
-        // Update basic user fields
-        $user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone_number' => $validated['phone_number'] ?? $user->phone_number,
-            'country' => $validated['country'] ?? $user->country,
-            'region' => $validated['region'] ?? $user->region,
-        ]);
+        // Update user data
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone_number = $request->phone_number;
+        $user->country = $request->country;
+        $user->region = $request->region;
 
-        // Update the password if provided
-        if (!empty($validated['password'])) {
-            $user->password = bcrypt($validated['password']);
-            $user->save();
-        }
-
-        // Handle the photo upload if provided
-        if ($request->hasFile('image')) {
-            // Check if the user already has an image
-            if ($user->profile_picture && file_exists(public_path('storage/' . $user->profile_picture))) {
-                // Delete the old image
-                unlink(public_path('storage/' . $user->profile_picture));
+        // Handle profile picture upload
+        if ($request->hasFile('profile_picture')) {
+            // Delete the old image if exists
+            if ($user->profile_picture && Storage::exists('public/' . $user->profile_picture)) {
+                Storage::delete('public/' . $user->profile_picture);
             }
 
-            // Store the new image
-            $imagePath = $request->file('image')->store('profile_images', 'public');
-
-            // Update the user's image path in the database
-            $user->update(['profile_picture' => $imagePath]);
+            // Store the new profile picture in the 'profile_images' directory
+            $user->profile_picture = $request->file('profile_picture')->store('profile_images', 'public');
         }
 
-        return redirect()->route('profile')->with('success', 'Profile updated successfully!');
+        // Handle password update
+        if ($request->filled('current_password') && Hash::check($request->current_password, $user->password)) {
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+        } else {
+            // Only allow password change if current password is correct
+            if ($request->filled('password')) {
+                return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+            }
+        }
+
+        // Save the updated user data
+        $user->save();
+
+        return redirect()->route('profile')->with('success', 'Profile updated successfully.');
     }
+
 
     public function destroy(User $user)
     {

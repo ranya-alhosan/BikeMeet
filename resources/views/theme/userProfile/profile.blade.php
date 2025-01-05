@@ -23,7 +23,7 @@
                      style="margin-top: -100px; backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.8); border-radius: 15px;">
                     <div class="row align-items-center">
                         <div class="col-md-4 text-center">
-                            <img src="{{ isset($user->profile_picture) && $user->profile_picture ? asset('storage/profile_images/' . $user->profile_picture) : asset('assets/img/users.png') }}"
+                            <img src="{{ isset($user->profile_picture) && $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('assets/img/users.png') }}"
                                  class="rounded-circle shadow-sm" style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;" data-bs-toggle="modal"
                                  data-bs-target="#imageModal" alt="User Profile Picture">
 
@@ -57,9 +57,10 @@
                                     <i class="fas fa-motorcycle me-2"></i>Motorcycles Owned: {{ $motorcycleCount }}
                                 </p>
                             @endif
-                            <a href="{{ route('UserProfile.edit', auth()->user()->id) }}" class="btn btn-outline-primary btn-sm mt-3">
+                            <a href="{{ route('UserProfile.edit') }}" class="btn btn-outline-primary btn-sm mt-3">
                                 <i class="fas fa-edit"></i> Edit Profile
                             </a>
+
                         </div>
                     </div>
                 </div>
@@ -238,7 +239,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <img src="{{ isset($user->profile_picture) && $user->profile_picture ? asset('storage/profile_images/' . $user->profile_picture) : asset('assets/img/users.png') }}" class="img-fluid rounded"
+                    <img src="{{ isset($user->profile_picture) && $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('assets/img/users.png') }}" class="img-fluid rounded"
                          alt="User Profile Picture">
                 </div>
             </div>

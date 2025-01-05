@@ -92,8 +92,10 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
 
     Route::get('/profile', [UsersController::class, 'profile'])->name('profile');
+
     Route::get('/UserProfile/edit', [UsersController::class, 'UserEdit'])->name('UserProfile.edit');
     Route::put('/UserProfile/update', [UsersController::class, 'UserUpdate'])->name('UserProfile.update');
+
     Route::get('/user-newsletters', [UsersController::class, 'showUserNewsletters'])->name('ProfNewsletters.index');
     Route::put('/ProfNewsletters/{id}', [UsersController::class, 'updateNewsletter'])->name('ProfNewsletters.update');
     Route::delete('/ProfNewsletters/{id}', [UsersController::class, 'destroyNewsletter'])->name('ProfNewsletters.destroy');
