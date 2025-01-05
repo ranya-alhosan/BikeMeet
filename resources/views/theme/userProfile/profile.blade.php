@@ -1,340 +1,325 @@
 @extends('theme.master')
 
 @section('content')
-    <div class="container-fluid mt-5">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="row">
-                    <div class="col-md-4 d-flex justify-content-center mb-4">
-                        <!-- Profile Image -->
-                        <img
-                            src="{{ isset($user->profile_picture) && $user->profile_picture ?
- asset('storage/' . $user->profile_picture) : asset('assets/img/users.png') }}"
-                            class="rounded-circle shadow"
-                            style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;"
-                            data-bs-toggle="modal"
-                            data-bs-target="#imageModal"
-                            alt="User Profile Picture"
-                        >
-                        <!-- Modal to Display the Image -->
-                        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="imageModalLabel">{{ $user->name }} Profile Picture</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <style>
+        .newsletter-image {
+            width: 100%; /* Makes the image responsive */
+            height: 200px; /* Fixed height */
+            object-fit: cover; /* Ensures the image doesn't stretch */
+            transition: transform 0.3s ease; /* Smooth transition for zoom effect */
+        }
+
+        .newsletter-image:hover {
+            transform: scale(0.9); /* Zoom out on hover */
+            cursor: pointer; /* Change cursor to pointer to indicate it's clickable */
+        }
+
+    </style>
+    <div class="container d-flex flex-column justify-content-center align-items-center min-vh-100">
+        <div class="row w-100">
+            <!-- User Info Section -->
+            <div class="col-md-7 mx-auto">
+                <div class="card shadow-lg p-4 border-0"
+                     style="margin-top: -100px; backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.8); border-radius: 15px;">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 text-center">
+                            <img src="{{ isset($user->profile_picture) && $user->profile_picture ? asset('storage/profile_images/' . $user->profile_picture) : asset('assets/img/users.png') }}"
+                                 class="rounded-circle shadow-sm" style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;" data-bs-toggle="modal"
+                                 data-bs-target="#imageModal" alt="User Profile Picture">
+
+                        </div>
+                        <div class="col-md-8 position-relative">
+                            <h3 class="fw-bold d-flex align-items-center justify-content-between">
+                                {{ $user->name }}
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-dark p-0" type="button" id="userDetailsMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-h fs-5"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDetailsMenu">
+                                        <li><a class="dropdown-item" href="{{ route('UserMotorcycles.index') }}">Motorcycles</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('events.UserIndex') }}">Events</a></li>
+                                        <form action="{{ route('logout') }}" method="POST">
+                                            @csrf
+                                            <button class="dropdown-item" type="submit">Logout</button>
+                                        </form>
+                                    </ul>
+                                </div>
+                            </h3>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-envelope me-2"></i>{{ $user->email }}
+                            </p>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-calendar-alt me-2"></i>Joined: {{ $user->created_at->format('F d, Y') }}
+                            </p>
+                            @if($motorcycleCount > 0)
+                                <p class="text-muted">
+                                    <i class="fas fa-motorcycle me-2"></i>Motorcycles Owned: {{ $motorcycleCount }}
+                                </p>
+                            @endif
+                            <a href="{{ route('UserProfile.edit', auth()->user()->id) }}" class="btn btn-outline-primary btn-sm mt-3">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Newsletters Section -->
+        <div class="col-md-9 mx-auto mt-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-center m-0">My Newsletters</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createNewsletterModal">
+                    Add New Newsletter
+                </button>
+            </div>
+
+            <!-- Modal to Add New Newsletter -->
+            <div class="modal fade" id="createNewsletterModal" tabindex="-1" aria-labelledby="createNewsletterModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="createNewsletterModalLabel">Create New Newsletter</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{ route('UserNewsletter.store') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="title">Title</label>
+                                        <input type="text" name="title" id="title" class="form-control" required>
                                     </div>
-                                    <div class="modal-body text-center">
-                                        <img
-                                            src="{{ isset($user->profile_picture) && $user->profile_picture ? asset('storage/' . $user->profile_picture) : asset('assets/img/users.png') }}"
-                                            class="img-fluid"
-                                            style="max-height: 90vh;"
-                                            alt="User Profile Picture"
-                                        >
+                                    <div class="form-group mt-3">
+                                        <label for="content">Content</label>
+                                        <textarea name="content" id="content" class="form-control" rows="5" required></textarea>
+                                    </div>
+                                    <div class="form-group mt-3">
+                                        <label for="image">Upload Image</label>
+                                        <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Newsletter</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
+            @if($newsletters->count() > 0)
+                <div class="row g-4">
+                    @foreach($newsletters as $newsletter)
+                        <div class="col-12">
+                            <div class="card shadow border-0">
+                                <div class="card-body">
+                                    <!-- Dropdown for Edit/Delete -->
+                                    <div class="dropdown position-absolute top-0 end-0 m-3">
+                                        <button class="btn btn-link text-dark p-0" type="button" id="newsletterMenu{{ $newsletter->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="newsletterMenu{{ $newsletter->id }}">
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('UserNewsletter.edit', $newsletter->id) }}">Edit</a>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('UserNewsletter.destroy', $newsletter->id) }}" method="POST" class="delete-newsletter-form" style="display: none;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
+                                            <li>
+                                                <a href="#" class="dropdown-item delete-newsletter" data-newsletter-id="{{ $newsletter->id }}">Delete</a>
+                                            </li>
+
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <h5 class="card-title text-primary fw-bold">{{ $newsletter->title }}</h5>
+                                    <p class="card-text text-muted">{{ Str::limit($newsletter->content, 100) }}</p>
+
+                                    <p class="text-muted small mb-3">
+                                        <i class="fas fa-user"></i>
+                                        <strong>Owner:</strong> {{ $newsletter->user->name ?? 'Unknown' }}
+                                        <i class="fas fa-clock"></i>
+                                        <strong>Posted:</strong> {{ $newsletter->created_at->diffForHumans() }}
+                                    </p>
+
+                                    @if($newsletter->image)
+                                        <img src="{{ asset('storage/' . $newsletter->image) }}" alt="Newsletter Image" class="img-fluid mb-3 newsletter-image" >
+                                    @endif
+
+
+                                    <div class="d-flex justify-content-start">
+                                        <form action="{{ route('ProfNewsletters.like', $newsletter->id) }}" method="POST" class="me-3">
+                                            @csrf
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-thumbs-up"></i> Like {{ $newsletter->likes->count() }}
+                                            </button>
+                                        </form>
+
+                                        <!-- Comment Section -->
+                                        <div class="comments-section">
+                                            <button class="btn btn-sm btn-outline-primary show-comment-form">
+                                                <i class="fas fa-comment-alt"></i>
+                                                <span class="comment-count">{{ $newsletter->comments->count() }} comments</span>
+                                            </button>
+
+                                            <form action="{{ route('UserNewsletter.comment', $newsletter->id) }}" method="POST" class="comment-form d-none mt-3">
+                                                @csrf
+                                                <div class="form-group">
+                                                    <textarea name="comment" class="form-control form-control-sm" placeholder="Write a comment..." required></textarea>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary btn-sm mt-2">Post</button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <div class="comments-list mt-3">
+                                        @if($newsletter->comments->isEmpty())
+                                            <p class="text-muted small">No comments yet. Be the first to comment!</p>
+                                        @else
+                                            @foreach($newsletter->comments->take(3) as $comment)
+                                                <div class="comment border-bottom pb-2 mb-2">
+                                                    <strong>{{ $comment->user->name }}</strong>: {{ $comment->comment }}
+                                                    <span class="text-muted small">{{ $comment->created_at->diffForHumans() }}</span>
+                                                </div>
+                                            @endforeach
+                                            <div class="hidden-comments" style="display: none;">
+                                                @foreach($newsletter->comments->skip(3) as $comment)
+                                                    <div class="comment border-bottom pb-2 mb-2">
+                                                        <strong>{{ $comment->user->name }}</strong>: {{ $comment->comment }}
+                                                        <span class="text-muted small">{{ $comment->created_at->diffForHumans() }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            @if($newsletter->comments->count() > 3)
+                                                <button class="btn btn-link read-more-btn" data-newsletter-id="{{ $newsletter->id }}">Read More</button>
+                                            @endif
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Hero Section -->
-                        <div class="col-md-8 info-user" style="margin-left: 20px;">
-                            <h1 class="mb-3">{{ $user->name }}</h1>
-                            <p class="text-muted mb-2">
-                                <strong>Email:</strong> {{ $user->email }}
-                            </p>
-                            <p class="text-muted mb-2">
-                                <strong>Joined:</strong> {{ $user->created_at->format('F d, Y') }}
-                            </p>
-                            @if($motorcycleCount > 0)
-                                <p class="text-muted mb-4">
-                                    <strong>Motorcycles Owned:</strong> {{ $motorcycleCount }}
-                                </p>
-                            @endif
-                        </div>
-
-                    </div>
+                    @endforeach
 
                 </div>
-                <div class="row">
 
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $newsletters->links() }}
                 </div>
-                <div class="news">
-                    <h2>My Newsletters</h2>
 
-                    @if(session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
-                    @if($newsletters->count() > 0)
-                        <div class="row">
-                            @foreach($newsletters as $newsletter)
-                                <div class="col-md-12 mb-4"> <!-- Changed col-md-6 to col-md-12 for full width -->
-                                    <div class="card shadow ">
-                                        <div class="card-body">
-                                            <!-- Top-right Icon for Edit/Delete -->
-                                            <div class="dropdown" style="position: absolute; top: 10px; right: 10px;">
-                                                <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-h"></i>
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal-{{ $newsletter->id }}">Edit</a></li>
-                                                    <li>
-                                                        <form action="{{ route('ProfNewsletters.destroy', $newsletter->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this newsletter?');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="dropdown-item text-danger">
-                                                                <i class="fas fa-trash-alt"></i> Delete
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                </ul>
-                                            </div>
-
-                                            <!-- Newsletter Content -->
-                                            <h5 class="mb-4">{{ $newsletter->title }}</h5>
-                                            <p>{{ Str::limit($newsletter->content, 150) }}</p>
-
-                                            <!-- Newsletter Image -->
-                                            <img src="{{ asset('storage/' . $newsletter->image) }}" alt="Newsletter Image" class="img-fluid rounded mb-4" width="100%" style="max-height: 400px; object-fit: cover;">
-
-                                            <!-- Display Like and Comment Count -->
-                                            <p class="text-muted mb-2">
-                                                <i class="fa fa-thumbs-up" style="color: {{ $newsletter->user_liked ? 'red' : 'gray' }};"></i>
-                                                {{ $newsletter->likes_count }} Likes |
-                                                <i class="fa fa-comments"></i> {{ $newsletter->comments_count }} Comments
-                                            </p>
-
-                                            <!-- Like Button -->
-                                            <form action="{{ route('ProfNewsletters.like', $newsletter->id) }}" method="POST" class="mt-2">
-                                                @csrf
-                                                <button type="submit" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-thumbs-up"></i> Like
-                                                </button>
-                                            </form>
-
-                                            <!-- Comment Form -->
-                                            <form action="{{ route('ProfNewsletters.comment', $newsletter->id) }}" method="POST" class="mt-2">
-                                                @csrf
-                                                <div class="form-group">
-                                                    <textarea name="comment" class="form-control" rows="2" placeholder="Add a comment..." required></textarea>
-                                                </div>
-                                                <button type="submit" class="btn btn-secondary btn-sm mt-1">
-                                                    <i class="fas fa-comment"></i> Comment
-                                                </button>
-                                            </form>
-
-                                            <!-- Display Comments -->
-                                            <div class="mt-3">
-                                                @if($newsletter->comments->count() > 0)
-                                                    <h5>Comments</h5>
-                                                    <ul class="list-unstyled">
-                                                        @foreach($newsletter->comments as $comment)
-                                                            <li class="mb-2">
-                                                                <strong>{{ $comment->user->name }}:</strong>
-                                                                <p>{{ $comment->content }}</p>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @else
-                                                    <p>No comments yet.</p>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <!-- Pagination -->
-                        <div class="d-flex justify-content-center">
-                            {{ $newsletters->links() }}
-                        </div>
-
-                    @else
-                        <p class="text-muted">You haven't published any newsletters yet.</p>
-                    @endif
+            @else
+                <div class="text-center">
+                    <p class="text-muted">You haven't published any newsletters yet.</p>
                 </div>
-                <header id="header" style=" top: calc(50px + 2rem); left: 0;">
-                    <nav class="nav-menu" style="position: absolute;">
-                        <ul>
-                            <li>
-                                <a href="{{ route('home') }}" >
-                                    <i class="fas fa-home"></i>
-                                    <span>Home</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('UserProfile.edit') }}">
-                                    <i class="fas fa-user"></i>
-                                    <span>Profile</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('UserMotorcycles.index') }}">
-                                    <i class="fas fa-motorcycle"></i>
-                                    <span>Motorcycles</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('events.UserIndex') }}">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <span>Events</span>
-                                </a>
-                            </li>
-
-                            <li>
-                                <form action="{{ route('logout') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="nav-link">
-                                        <i class="fas fa-sign-out-alt"></i>
-                                        <span>Logout</span>
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </nav>
-                </header>
-
-            </div>
-
-            <style>
-                :root {
-                    --nav-color: #e05100;
-                    --nav-font: "Poppins", sans-serif;
-                    --default-color: #45505b;
-                    --contrast-color: #fff;
-                    --nav-hover-color: #008FE0;
-                }
-
-                #header {
-                    position: fixed;
-                    z-index: 9997;
-                    padding: 15px;
-                    top: 350px;
-                }
-
-                @media (max-width: 991px) {
-                    #header {
-                        position: relative;
-                        top: 0;
-                        padding: 15px 0;
-                    }
-
-                    .container-fluid {
-                        padding-left: 15px;
-                    }
-                }
-
-
-                .nav-menu {
-                    padding: 0;
-                    z-index: 1;
-                }
-
-                .nav-menu ul {
-                    list-style: none;
-                    padding: 0 0 20px 0;
-                    margin: 0;
-                    width: 140px;
-                }
-
-                .nav-menu a,
-                .nav-menu a:focus,
-                .nav-menu button.nav-link {
-                    color: var(--nav-color);
-                    font-family: var(--nav-font);
-                    display: flex;
-                    align-items: center;
-                    padding: 10px 18px;
-                    margin-bottom: 8px;
-                    font-size: 15px;
-                    border-radius: 50px;
-                    background: color-mix(in srgb, var(--default-color), transparent 92%);
-                    height: 56px;
-                    width: 100%;
-                    overflow: hidden;
-                    transition: 0.3s;
-                    border: none;
-                    cursor: pointer;
-                    text-decoration: none;
-                }
-
-                .nav-menu a i,
-                .nav-menu a:focus i,
-                .nav-menu button.nav-link i {
-                    font-size: 20px;
-                }
-
-                .nav-menu a span,
-                .nav-menu a:focus span,
-                .nav-menu button.nav-link span {
-                    padding: 0 5px 0 7px;
-                }
-
-                @media (min-width: 992px) {
-                    .nav-menu a,
-                    .nav-menu a:focus,
-                    .nav-menu button.nav-link {
-                        max-width: 56px;
-                    }
-
-                    .nav-menu a span,
-                    .nav-menu a:focus span,
-                    .nav-menu button.nav-link span {
-                        display: none;
-                    }
-                }
-
-                .nav-menu a:hover,
-                .nav-menu .active,
-                .nav-menu .active:focus,
-                .nav-menu li:hover > a,
-                .nav-menu button.nav-link:hover {
-                    color: var(--contrast-color);
-                    background: var(--nav-hover-color);
-                    max-width: 100%;
-                }
-
-                .nav-menu a:hover span,
-                .nav-menu li:hover > a span,
-                .nav-menu button.nav-link:hover span {
-                    display: block;
-                }
-                /* Profile Page Styling */
-                .container-fluid {
-                    font-family: 'Poppins', sans-serif;
-                }
-
-                .info-user {
-                    margin-top: -50px;
-                }
-
-                /* Profile Image */
-                img.rounded-circle {
-                    border: 4px solid #007bff;
-                    margin-top: -120px;
-                    transition: transform 0.3s ease-in-out, border-color 0.3s ease-in-out;
-                }
-
-                img.rounded-circle:hover {
-                    transform: scale(1.1);
-                    border-color: #0056b3;
-                }
-                .info-user {
-                    margin-top: -50px;
-                    margin-left: 20px; /* Adds space to the left */
-                }
-
-            </style>
-
+            @endif
         </div>
     </div>
+
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">{{ $user->name }} Profile Picture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="{{ isset($user->profile_picture) && $user->profile_picture ? asset('storage/profile_images/' . $user->profile_picture) : asset('assets/img/users.png') }}" class="img-fluid rounded"
+                         alt="User Profile Picture">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Newsletter Image Modal -->
+    <div class="modal fade" id="newsletterImageModal" tabindex="-1" aria-labelledby="newsletterImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" alt="Full-size image" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 @endsection
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.show-comment-form').click(function () {
+            $(this).next('.comment-form').toggleClass('d-none');
+        });
+
+        $('.read-more-btn').on('click', function () {
+            var button = $(this);
+            var hiddenComments = button.closest('.comments-list').find('.hidden-comments');
+            hiddenComments.slideDown();
+            button.hide();
+        });
+    });
+    $(document).ready(function () {
+        $('.delete-newsletter').on('click', function (e) {
+            e.preventDefault();
+            var newsletterId = $(this).data('newsletter-id');
+            var deleteForm = $('.delete-newsletter-form');
+
+            // Use Laravel route helper to generate the delete URL
+            var deleteUrl = '{{ route('UserNewsletter.destroy', ':id') }}'.replace(':id', newsletterId);
+
+            // Trigger SweetAlert
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, set the form action dynamically and submit the form
+                    deleteForm.attr('action', deleteUrl);
+                    deleteForm.submit();
+                }
+            });
+        });
+    });
+    $(document).ready(function () {
+        // Handle profile image click to open the profile image modal
+        $('.profile-image').on('click', function () {
+            const imageUrl = $(this).attr('src');
+            $('#profileImageModal img').attr('src', imageUrl);
+            $('#profileImageModal').modal('show');
+        });
+
+        // Handle newsletter image click to open the newsletter image modal
+        $('.newsletter-image').on('click', function () {
+            const imageUrl = $(this).attr('src');
+            $('#modalImage').attr('src', imageUrl); // Set the full-size image source
+            $('#newsletterImageModal').modal('show'); // Show the newsletter image modal
+        });
+
+        // Other JavaScript code for comment form and delete functionality...
+    });
+
+
+</script>
 

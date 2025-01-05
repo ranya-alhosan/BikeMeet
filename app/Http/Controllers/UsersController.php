@@ -75,10 +75,10 @@ class UsersController extends Controller
     }
     public function UserEdit(User $user)
     {
-
+        // Return the view for editing the user
         return view('theme.userProfile.edit', compact('user'));
-
     }
+
 
     public function update(Request $request, User $user)
     {
@@ -86,12 +86,10 @@ class UsersController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed', // For password, 'nullable' allows no change
             'phone_number' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
             'region' => 'nullable|string|max:100',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'role' => 'required|in:user,admin,super_admin',
         ]);
 
         // Update the user
@@ -100,12 +98,6 @@ class UsersController extends Controller
         $user->phone_number = $request->input('phone_number');
         $user->country = $request->input('country');
         $user->region = $request->input('region');
-        $user->role = $request->input('role');
-
-        // If the password is provided, hash it and update
-        if ($request->filled('password')) {
-            $user->password = bcrypt($request->input('password'));
-        }
 
         // Handle profile picture upload (if any)
         if ($request->hasFile('profile_picture')) {
@@ -118,9 +110,10 @@ class UsersController extends Controller
         // Save the user
         $user->save();
 
-        // Flash success message and redirect
-        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+        // Redirect back to the "My Newsletter" page with a success message
+        return redirect()->route('users.index')->with('success', 'Profile updated successfully.');
     }
+
 
 
 

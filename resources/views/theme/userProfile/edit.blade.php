@@ -30,7 +30,7 @@
 
                                 <div class="form-group">
                                     <label for="email">Email</label>
-                                    <input type="email" name="email" id="email" value="{{ old('email', auth()->user()->email) }}" class="form-control" required>
+                                    <input type="email" name="email" id="email" value="{{ old('email', auth()->user()->email) }}" class="form-control" required autocomplete="username">
                                 </div>
 
                                 <div class="form-group">
@@ -50,17 +50,17 @@
 
                                 <div class="form-group">
                                     <label for="current_password">Current Password</label>
-                                    <input type="password" name="current_password" id="current_password" class="form-control" placeholder="Enter current password">
+                                    <input type="password" name="current_password" id="current_password" class="form-control" placeholder="Enter current password" autocomplete="current-password">
                                 </div>
 
                                 <div class="form-group">
                                     <label for="password">New Password</label>
-                                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter new password">
+                                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter new password" autocomplete="new-password">
                                 </div>
 
                                 <div class="form-group">
                                     <label for="password_confirmation">Confirm New Password</label>
-                                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Confirm new password">
+                                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Confirm new password" autocomplete="new-password">
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Update Profile</button>

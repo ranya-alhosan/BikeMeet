@@ -6,6 +6,8 @@ use App\Models\NewsletterLike;
 use App\Models\NewsletterComment;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
 
 class NewsletterController extends Controller
 {
@@ -69,21 +71,45 @@ class NewsletterController extends Controller
         ]);
     }
 
+    // In NewsletterController.php
+
     public function destroy($id)
     {
-        $comment = NewsletterComment::findOrFail($id);
+        // Retrieve the newsletter by its ID
+        $newsletter = Newsletter::findOrFail($id);
 
-        if (auth()->id() !== $comment->user_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        // Check if the authenticated user is the owner of the newsletter
+        if ($newsletter->user_id !== auth()->id()) {
+            return redirect()->route('newsletters.index')->with('error', 'You do not have permission to delete this newsletter.');
         }
 
-        $comment->delete();
+        // Delete the image if it exists
+        if ($newsletter->image) {
+            Storage::delete('public/' . $newsletter->image);
+        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Comment deleted successfully.',
-        ]);
+        // Delete the newsletter
+        $newsletter->delete();
+
+        // Redirect back with a success message
+        return redirect()->route('profile')->with('success', 'Newsletter deleted successfully.');
     }
+
+//    public function destroy($id)
+//    {
+//        $comment = NewsletterComment::findOrFail($id);
+//
+//        if (auth()->id() !== $comment->user_id) {
+//            return response()->json(['error' => 'Unauthorized'], 403);
+//        }
+//
+//        $comment->delete();
+//
+//        return response()->json([
+//            'success' => true,
+//            'message' => 'Comment deleted successfully.',
+//        ]);
+//    }
     public function destroyNews($id)
     {
         $newsletter = Newsletter::findOrFail($id);
@@ -98,27 +124,67 @@ class NewsletterController extends Controller
         return redirect()->route('newsletters.index')->with('success', 'Newsletter deleted successfully!');
     }
 
+//    public function update(Request $request, $id)
+//    {
+//        $comment = NewsletterComment::findOrFail($id);
+//
+//        if (auth()->id() !== $comment->user_id) {
+//            return response()->json(['error' => 'Unauthorized'], 403); // Prevent unauthorized access
+//        }
+//
+//        $request->validate([
+//            'comment' => 'required|string|max:255',
+//        ]);
+//
+//        $comment->update([
+//            'comment' => $request->input('comment'),
+//        ]);
+//
+//        return response()->json([
+//            'success' => true,
+//            'message' => 'Comment updated successfully.',
+//            'comment' => $comment->comment,
+//        ]);
+//    }
+// In NewsletterController.php
+
     public function update(Request $request, $id)
     {
-        $comment = NewsletterComment::findOrFail($id);
+        // Validate the incoming data
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
 
-        if (auth()->id() !== $comment->user_id) {
-            return response()->json(['error' => 'Unauthorized'], 403); // Prevent unauthorized access
+        // Retrieve the newsletter by its ID
+        $newsletter = Newsletter::findOrFail($id);
+
+        // Check if the authenticated user is the owner of the newsletter
+        if ($newsletter->user_id !== auth()->id()) {
+            return redirect()->route('newsletters.index')->with('error', 'You do not have permission to update this newsletter.');
         }
 
-        $request->validate([
-            'comment' => 'required|string|max:255',
-        ]);
+        // Update the newsletter's title and content
+        $newsletter->title = $validated['title'];
+        $newsletter->content = $validated['content'];
 
-        $comment->update([
-            'comment' => $request->input('comment'),
-        ]);
+        // If there's a new image, store it and update the image path
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($newsletter->image) {
+                Storage::delete('public/' . $newsletter->image);
+            }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Comment updated successfully.',
-            'comment' => $comment->comment,
-        ]);
+            // Store the new image
+            $newsletter->image = $request->file('image')->store('newsletters', 'public');
+        }
+
+        // Save the updated newsletter
+        $newsletter->save();
+
+        // Redirect back to the newsletter list with a success message
+        return redirect()->route('profile')->with('success', 'Newsletter updated successfully.');
     }
 
     public function comment(Request $request, Newsletter $newsletter)
@@ -197,13 +263,24 @@ class NewsletterController extends Controller
 
     public function edit($id)
     {
-        $user = auth()->user();
         $newsletter = Newsletter::findOrFail($id);
-
-        if ($user->role === 'admin')
-            return view('dashboard.newsletters.edit', compact('newsletter'));
+        return view('dashboard.newsletters.edit', compact('newsletter'));
 
     }
+    public function UserEdit($id)
+    {
+        // Retrieve the newsletter by its ID
+        $newsletter = Newsletter::findOrFail($id);
+
+        // Check if the authenticated user is the owner of the newsletter
+        if ($newsletter->user_id !== auth()->id()) {
+            return redirect()->route('newsletters.index')->with('error', 'You do not have permission to edit this newsletter.');
+        }
+
+        // Return the edit view with the newsletter data
+        return view('theme.newsletters.edit', compact('newsletter'));
+    }
+
     public function DashEdit($id)
     {
         // Find the newsletter by ID
@@ -252,7 +329,6 @@ class NewsletterController extends Controller
     {
         return view('dashboard.newsletters.create');
     }
-
     public function DashStore(Request $request)
     {
         // Validate the incoming request
@@ -281,8 +357,6 @@ class NewsletterController extends Controller
         // Redirect back to the newsletters index with a success message
         return redirect()->route('newsletters.index')->with('success', 'Newsletter created successfully!');
     }
-
-
     public function search(Request $request)
     {
         $query = $request->get('query', '');

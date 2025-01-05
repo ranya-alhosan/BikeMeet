@@ -82,6 +82,10 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('/UserNewsletters', [NewsletterController::class, 'store'])->name('UserNewsletter.store');
     Route::get('/UserNewsletters/search', [NewsletterController::class, 'search'])->name('UserNewsletters.search');
 
+    Route::get('/user-newsletter/{id}/edit', [NewsletterController::class, 'UserEdit'])->name('UserNewsletter.edit');
+    Route::put('/user-newsletter/{id}', [NewsletterController::class, 'update'])->name('UserNewsletter.update');
+    Route::delete('/user-newsletters/{newsletter}', [NewsletterController::class, 'destroy'])->name('UserNewsletter.destroy');
+
     Route::post('/events/{event}/enroll', [EventController::class, 'enroll'])->name('events.enroll');
     Route::get('/createEvent', [EventController::class, 'create'])->name('UserEvents.create');
     Route::post('/UserEvents/store', [EventController::class, 'store'])->name('events.UserStore');
