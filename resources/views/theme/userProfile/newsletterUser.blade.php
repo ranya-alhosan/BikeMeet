@@ -1,4 +1,6 @@
 @extends('theme.master')
+@section('hero-title', 'User Newsletters')
+
 @section('newsletters-active','active')
 
 @section('content')

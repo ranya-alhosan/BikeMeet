@@ -11,6 +11,7 @@ use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use App\Models\EventEnrollment;
 
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
@@ -187,6 +188,61 @@ class EventController extends Controller
         // Redirect to the events index page with success message
         return redirect()->route('events.UserIndex')->with('success', 'Event created successfully.');
     }
+    public function ProfileStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'start_date' => 'required|date',
+            'end_date' => [
+                'required',
+                'date',
+                'after_or_equal:start_date', // Check that the end date is after or equal to the start date
+                function ($attribute, $value, $fail) use ($request) {
+                    // Ensure that the time of the start date is not equal to the time of the end date
+                    $startDateTime = \Carbon\Carbon::parse($request->start_date);
+                    $endDateTime = \Carbon\Carbon::parse($value);
+
+                    if ($startDateTime->isSameMinute($endDateTime)) {
+                        $fail('The start date and time must not be equal to the end date and time.');
+                    }
+                }
+            ],
+            'fee' => 'required|numeric|min:0',
+            'status' => 'required|in:upcoming,completed',
+        ]);
+
+        // Create the event
+        Event::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'location' => $request->location,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'fee' => $request->fee,
+            'status' => $request->status,
+            'user_id' => auth()->id(), // Assuming the user creating the event is logged in
+        ]);
+
+
+
+        return redirect()->route('user.events')->with('success', 'Event created successfully!');
+    }
+
+    public function userEvents()
+    {
+        $user = Auth::user();
+
+        // Get events that the user has created (as organizer) or enrolled in
+        $events = Event::where('user_id', $user->id)  // Events organized by the user
+        ->orWhereHas('enrollments', function ($query) use ($user) {
+            $query->where('user_id', $user->id);  // Events the user is enrolled in
+        })
+            ->paginate(6); // Use pagination instead of get()
+
+        return view('theme.userProfile.event', compact('events'));
+    }
 
     public function edit(Event $event)
     {
@@ -223,6 +279,36 @@ class EventController extends Controller
 
         return redirect()->route('events.index')->with('success', 'Event updated successfully!');
     }
+    public function ProfileUpdate(Request $request, Event $event)
+    {
+        // Validate the incoming data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'fee' => 'nullable|numeric|min:0',
+            'status' => 'required|in:upcoming,completed',
+        ]);
+
+        // Update the event
+        $event->update($validatedData);
+
+        // Check if the event status is 'completed' or if the event's time has passed
+        if ($event->status === 'completed' || now()->greaterThanOrEqualTo($event->end_date)) {
+            // Update the status of all associated event enrollments to 'completed'
+            $event->enrollments()->update(['status' => 'completed']);
+        }
+
+        // If the status changes from 'completed' to 'upcoming', reset enrollment statuses
+        if ($event->status === 'upcoming' && $event->wasChanged('status')) {
+            // Reset the enrollment statuses to 'pending' or 'confirmed'
+            $event->enrollments()->update(['status' => 'pending']);
+        }
+
+        return redirect()->route('user.events')->with('success', 'Event updated successfully!');
+    }
 
     public function destroy(Event $event)
     {
@@ -230,6 +316,29 @@ class EventController extends Controller
 
         return redirect()->route('events.index')->with('success', 'Event deleted successfully!');
     }
+    public function ProfileDestroy($eventId)
+    {
+        $event = Event::find($eventId);
+
+        if ($event) {
+            // Delete the enrollments associated with this event
+            $event->enrollments()->delete();
+
+            // Delete the event itself
+            $event->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Event and related enrollments deleted successfully.',
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Event not found.',
+        ], 404);
+    }
+
 
     public function latestEvents()
     {
@@ -289,6 +398,17 @@ class EventController extends Controller
         }
 
         return view('theme.index', compact('testimonials', 'events', 'totalUsers', 'totalRentals', 'totalEvents', 'totalNewsletters'));
+    }
+    public function enrolledEvents()
+    {
+        $user = auth()->user();
+
+        // Get events the user is enrolled in
+        $enrolledEvents = Event::whereHas('enrollments', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->with('enrollments')->get();
+
+        return view('theme.userProfile.enrolled-events', compact('enrolledEvents'));
     }
 
 }

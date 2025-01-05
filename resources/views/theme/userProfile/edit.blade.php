@@ -1,4 +1,5 @@
 @extends('theme.master')
+@section('hero-title', 'Edit User Profile')
 
 @section('content')
     <div class="container mt-5">

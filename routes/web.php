@@ -108,6 +108,14 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
     Route::resource('testimonials', TestimonialController::class);
 
+    Route::get('/user-events', [EventController::class, 'userEvents'])->name('user.events');
+    Route::put('/events/{event}', [EventController::class, 'ProfileUpdate'])->name('events.update');
+    Route::put('/enrollments/{id}', [EventEnrollmentController::class, 'ProfileUpdate'])->name('enrollments.update');
+
+    Route::get('/enrolled-events', [EventController::class, 'enrolledEvents'])->name('events.enrolled');
+    Route::post('/events', [EventController::class, 'ProfileStore'])->name('events.store');
+    Route::delete('/events/{event}', [EventController::class, 'ProfileDestroy'])->name('events.destroy');
+
 });
 
 Route::middleware('auth')->group(function () {

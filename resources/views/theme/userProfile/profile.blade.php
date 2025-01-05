@@ -37,7 +37,8 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDetailsMenu">
                                         <li><a class="dropdown-item" href="{{ route('UserMotorcycles.index') }}">Motorcycles</a></li>
-                                        <li><a class="dropdown-item" href="{{ route('events.UserIndex') }}">Events</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('user.events') }}">Events</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('events.enrolled') }}">Enrolled Events</a></li>
                                         <form action="{{ route('logout') }}" method="POST">
                                             @csrf
                                             <button class="dropdown-item" type="submit">Logout</button>

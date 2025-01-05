@@ -1,5 +1,7 @@
 @extends('theme.master')
 
+@section('hero-title', 'User Motorcycles')
+
 @section('content')
 
 

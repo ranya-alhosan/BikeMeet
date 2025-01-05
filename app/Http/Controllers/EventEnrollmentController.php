@@ -123,5 +123,12 @@ class EventEnrollmentController extends Controller
         return redirect()->route('enrollment.index')->with('success', 'Enrollment added successfully.');
     }
 
+    public function ProfileUpdate(Request $request, $id)
+    {
+        $enrollment = EventEnrollment::findOrFail($id);
+        $enrollment->status = $request->input('status');
+        $enrollment->save();
 
+        return redirect()->back()->with('success', 'Enrollment status updated successfully.');
+    }
 }
