@@ -260,12 +260,11 @@ class RentalController extends Controller
         // Add record to user_rentals table
         DB::table('user_rentals')->insert([
             'user_id' => auth()->id(),
-            'motorcycle_id' => $rental->motorcycle_id, // Assign the motorcycle ID
+            'motorcycle_id' => $rental->motorcycle_id,
             'rent_id' => $rental->id,
             'status' => 'active',
             'created_at' => now(),
             'updated_at' => now(),
-
         ]);
 
         // Redirect back with success message

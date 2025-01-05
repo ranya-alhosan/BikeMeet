@@ -35,7 +35,7 @@
         }
 
         .form-control {
-            background-color: var(--light);
+            background-color: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.3);
             color: var(--light);
         }

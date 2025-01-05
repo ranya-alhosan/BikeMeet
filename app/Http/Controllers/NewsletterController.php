@@ -95,21 +95,21 @@ class NewsletterController extends Controller
         return redirect()->route('profile')->with('success', 'Newsletter deleted successfully.');
     }
 
-//    public function destroy($id)
-//    {
-//        $comment = NewsletterComment::findOrFail($id);
-//
-//        if (auth()->id() !== $comment->user_id) {
-//            return response()->json(['error' => 'Unauthorized'], 403);
-//        }
-//
-//        $comment->delete();
-//
-//        return response()->json([
-//            'success' => true,
-//            'message' => 'Comment deleted successfully.',
-//        ]);
-//    }
+    public function commentDestroy($id)
+    {
+        $comment = NewsletterComment::findOrFail($id);
+
+        if (auth()->id() !== $comment->user_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Comment deleted successfully.',
+        ]);
+    }
     public function destroyNews($id)
     {
         $newsletter = Newsletter::findOrFail($id);
@@ -124,29 +124,28 @@ class NewsletterController extends Controller
         return redirect()->route('newsletters.index')->with('success', 'Newsletter deleted successfully!');
     }
 
-//    public function update(Request $request, $id)
-//    {
-//        $comment = NewsletterComment::findOrFail($id);
-//
-//        if (auth()->id() !== $comment->user_id) {
-//            return response()->json(['error' => 'Unauthorized'], 403); // Prevent unauthorized access
-//        }
-//
-//        $request->validate([
-//            'comment' => 'required|string|max:255',
-//        ]);
-//
-//        $comment->update([
-//            'comment' => $request->input('comment'),
-//        ]);
-//
-//        return response()->json([
-//            'success' => true,
-//            'message' => 'Comment updated successfully.',
-//            'comment' => $comment->comment,
-//        ]);
-//    }
-// In NewsletterController.php
+    public function commentUpdate(Request $request, $id)
+    {
+        $comment = NewsletterComment::findOrFail($id);
+
+        if (auth()->id() !== $comment->user_id) {
+            return response()->json(['error' => 'Unauthorized'], 403); // Prevent unauthorized access
+        }
+
+        $request->validate([
+            'comment' => 'required|string|max:255',
+        ]);
+
+        $comment->update([
+            'comment' => $request->input('comment'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Comment updated successfully.',
+            'comment' => $comment->comment,
+        ]);
+    }
 
     public function update(Request $request, $id)
     {

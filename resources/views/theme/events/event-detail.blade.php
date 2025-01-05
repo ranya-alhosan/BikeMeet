@@ -49,7 +49,7 @@
                             @if($event->user_id !== auth()->id()) <!-- Check if the logged-in user is not the event creator -->
                             <form action="{{ route('events.enroll', $event->id) }}" method="POST" id="enrollForm" class="d-inline">
                                 @csrf
-                                <button type="submit" class="btn btn-primary btn-lg" id="enrollBtn">
+                                <button type="button" class="btn btn-primary btn-lg" id="enrollBtn">
                                     Enroll
                                 </button>
                             </form>
@@ -76,10 +76,11 @@
 @endsection
 
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.getElementById('enrollBtn')?.addEventListener('click', function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Prevent form submission
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: "Do you want to enroll in this event?",
@@ -89,6 +90,7 @@
                 cancelButtonText: 'No, cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // Submit the form if user confirms
                     document.getElementById('enrollForm').submit();
                 }
             });
@@ -115,4 +117,3 @@
         @endif
     </script>
 @endsection
-

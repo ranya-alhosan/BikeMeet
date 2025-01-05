@@ -77,8 +77,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
     Route::post('/UserNewsletter/{newsletter}/like', [NewsletterController::class, 'like'])->name('UserNewsletter.like');
     Route::post('/UserNewsletter/{newsletter}/comment', [NewsletterController::class, 'comment'])->name('UserNewsletter.comment');
-    Route::delete('/UserComments/{id}', [NewsletterController::class, 'destroy'])->name('UserNewsletter.comment.delete');
-    Route::patch('/UserComments/{id}', [NewsletterController::class, 'update'])->name('UserNewsletter.comment.update');
+    Route::delete('/UserComments/{id}', [NewsletterController::class, 'commentDestroy'])->name('UserNewsletter.comment.delete');
+    Route::patch('/UserComments/{id}', [NewsletterController::class, 'commentUpdate'])->name('UserNewsletter.comment.update');
     Route::post('/UserNewsletters', [NewsletterController::class, 'store'])->name('UserNewsletter.store');
     Route::get('/UserNewsletters/search', [NewsletterController::class, 'search'])->name('UserNewsletters.search');
 
@@ -86,7 +86,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::put('/user-newsletter/{id}', [NewsletterController::class, 'update'])->name('UserNewsletter.update');
     Route::delete('/user-newsletters/{newsletter}', [NewsletterController::class, 'destroy'])->name('UserNewsletter.destroy');
 
-    Route::post('/events/{event}/enroll', [EventController::class, 'enroll'])->name('events.enroll');
+    Route::post('/events/{eventId}/enroll', [EventController::class, 'enroll'])->name('events.enroll');
     Route::get('/createEvent', [EventController::class, 'create'])->name('UserEvents.create');
     Route::post('/UserEvents/store', [EventController::class, 'store'])->name('events.UserStore');
 

@@ -43,40 +43,7 @@
     </div>
     <!-- Service End -->
 
-    <!-- Latest Events Section -->
-    <div class="container-xxl py-5">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h6 class="text-primary text-uppercase">// Latest Events //</h6>
-                <h1>Unforgettable Moments You Can't Miss</h1>
-            </div>
-            <div class="row g-4">
-                @foreach($events as $event)
-                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="event-card">
-                            <!-- Event Tag -->
-                            <div class="event-tag">{{ $event->category ?? 'General' }}</div>
-
-                            <!-- Event Image -->
-                            <img src="{{ $event->image_url ?? 'https://via.placeholder.com/400x180' }}" alt="Event Image">
-
-                            <!-- Event Info -->
-                            <div class="event-info">
-                                <h5>{{ $event->title }}</h5>
-                                <p>{{ Str::limit($event->description, 100) }}</p>
-                                <a
-                                    href="{{ auth()->check() ? route('events.showEventDetails', $event->id) : route('login') }}"
-                                    class="btn"
-                                >
-                                    Learn More
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
+    
 
     <!-- About Start -->
     <div class="container-xxl py-5">

@@ -131,6 +131,7 @@ class EventController extends Controller
         return redirect()->route('events.UserIndex')->with('success', 'You have successfully enrolled in the event.');
     }
 
+
     public function create()
     {
         $user = auth()->user();

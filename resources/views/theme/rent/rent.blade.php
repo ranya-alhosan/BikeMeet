@@ -52,14 +52,11 @@
                     </div>
                     <!-- Filter by Status -->
                     <div class="form-group">
-                        <label for="status"  class="mt-2">Rental Status</label>
-                        <select name="status" id="status" class="form-select">
-                            <option value="">Select Status</option>
-                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
-                            <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed
-                            </option>
-                            <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled
-                            </option>
+                        <label for="rent_status"  class="mt-2">Rental Availability</label>
+                        <select name="rent_status" id="rent_status" class="form-select">
+                            <option value="">Select Availability</option>
+                            <option value="available" {{ request('rent_status') == 'available' ? 'selected' : '' }}>Available</option>
+                            <option value="rented" {{ request('rent_status') == 'rented' ? 'selected' : '' }}>Rented</option>
                         </select>
                     </div>
                     <!-- Filter by Price Range -->
@@ -89,15 +86,6 @@
                                     value="{{ request('end_date') }}">
                             </div>
                         </div>
-                    </div>
-                    <!-- Filter by Rental Availability -->
-                    <div class="form-group">
-                        <label for="rent_status"  class="mt-2">Rental Availability</label>
-                        <select name="rent_status" id="rent_status" class="form-control">
-                            <option value="">Select Availability</option>
-                            <option value="available" {{ request('rent_status') == 'available' ? 'selected' : '' }}>Available</option>
-                            <option value="rented" {{ request('rent_status') == 'rented' ? 'selected' : '' }}>Rented</option>
-                        </select>
                     </div>
                     <!-- Apply and Clear Filters -->
                     <div class="d-flex flex-column gap-2 mt-3">
