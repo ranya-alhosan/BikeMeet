@@ -243,7 +243,7 @@
             </div>
         </div>
     </div>
-    
+
 
     <!-- Newsletter Image Modal -->
     <div class="modal fade" id="newsletterImageModal" tabindex="-1" aria-labelledby="newsletterImageModalLabel" aria-hidden="true">
@@ -255,7 +255,6 @@
             </div>
         </div>
     </div>
-
 
 
 @endsection

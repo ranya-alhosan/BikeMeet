@@ -40,10 +40,13 @@ class MotorcycleController extends Controller
     public function userMotorcycles()
     {
         $user = auth()->user();
-        $motorcycles = $user->motorcycles; // Fetch motorcycles associated with the logged-in user
+
+        // Paginate motorcycles associated with the logged-in user (10 per page in this example)
+        $motorcycles = $user->motorcycles()->paginate(6);
 
         return view('theme.userProfile.userMotorcycles', compact('motorcycles'));
     }
+
 
 
     public function create()
@@ -82,14 +85,13 @@ class MotorcycleController extends Controller
     {
         // Validate input
         $request->validate([
-            'user_id' => 'required|exists:users,id', // Ensure user exists
             'make' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'year' => 'required|integer|min:1900|max:2100',
             'price_per_day' => 'required|numeric|min:0',
             'availability_status' => 'required|in:available,under_maintenance',
             'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         // Handle image upload if present
@@ -98,9 +100,9 @@ class MotorcycleController extends Controller
             $imagePath = $request->file('image')->store('motorcycle_images', 'public');
         }
 
-        // Create the motorcycle and associate it with the selected user
+        // Create the motorcycle and associate it with the logged-in user
         Motorcycle::create([
-            'user_id' => $request->user_id, // Link to the selected user
+            'user_id' => auth()->id(), // Get the logged-in user's ID
             'make' => $request->make,
             'model' => $request->model,
             'year' => $request->year,
@@ -109,14 +111,10 @@ class MotorcycleController extends Controller
             'description' => $request->description,
             'image' => $imagePath,
         ]);
-//        $user = auth()->user();
-//        if ($user->role === 'admin') {
-//
-//            return redirect()->route('motorcycles.index')->with('success', 'Motorcycle added successfully');
-//        }
-        return redirect()->back()->with('success', 'Motorcycle added successfully!');
 
+        return redirect()->back()->with('success', 'Motorcycle added successfully!');
     }
+
 
 
 
